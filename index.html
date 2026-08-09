@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>つくったもの — 毎月の手作業をアプリにしました</title>
-<meta name="description" content="請求書づくり、領収書の発行、イベントの収支管理、クレジットカードの支出把握。毎月くり返していた手作業を、自分でアプリにしてきました。ログイン不要で触れるデモです。">
+<title>つくったもの｜毎月の手作業をアプリにしました</title>
+<meta name="description" content="請求書づくり、領収書の発行、イベントの収支管理、クレジットカードの支出把握。毎月くり返していた手作業を、自分でアプリにしてきました。ログイン不要で試せるデモを公開しています。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧰</text></svg>">
 <style>
 /* ============================================================
@@ -267,7 +267,7 @@ h2 {
   letter-spacing: .005em;
 }
 
-/* 困っていたこと → こうした */
+/* 困っていたこと → 解決したこと */
 .story { margin: 0 0 1.4rem; }
 
 .story dt {
@@ -452,9 +452,9 @@ footer a:hover { color: var(--accent); }
     <p class="lede">
       請求書づくり、領収書の発行、イベントのお金の管理、クレジットカードの支出把握。
       どれも「面倒だな」と思いながら毎月やっていたことです。
-      ここに置いてあるのは、実際に仕事で使っているものを、
-      中身を<strong>架空のデータに入れ替えたお試し版</strong>。
-      登録もログインも要りません。押せば、そのまま動きます。
+      ここに置いてあるのは、実際に業務で使っているものを、
+      中身だけ<strong>架空のデータに入れ替えたデモ版</strong>です。
+      登録もログインも不要で、開いてすぐ試せます。
     </p>
   </header>
 
@@ -478,12 +478,12 @@ footer a:hover { color: var(--accent); }
       <dl class="story">
         <dt>困っていたこと</dt>
         <dd>毎月、前の月の請求書ファイルをコピーして、日付と金額を書き換えていました。税金の差し引きを電卓で計算するので、たまに間違えます。</dd>
-        <dt>こうした</dt>
-        <dd>取引先を一度登録しておけば、あとは<strong>選んで金額を入れるだけ</strong>。消費税と源泉徴収の差し引きまで自動で計算して、そのまま印刷できる形で書き出します。出した請求書は一覧に残り、入金が済んだかどうかもひと目で分かります。</dd>
+        <dt>解決したこと</dt>
+        <dd>取引先を一度登録しておけば、あとは<strong>選んで金額を入れるだけ</strong>。消費税と源泉徴収の差し引きまで自動で計算し、そのままPDFとして書き出します。発行した請求書は一覧に残るので、入金が済んだかどうかも後から確認できます。</dd>
       </dl>
 
       <ul class="tags">
-        <li>印刷できる形で書き出し</li><li>税金の計算は自動</li><li>入金の管理</li><li>スマホでも使える</li>
+        <li>PDFで書き出し</li><li>消費税と源泉徴収を自動計算</li><li>入金状況の管理</li><li>スマホ対応</li>
       </ul>
 
       <details class="tech">
@@ -492,7 +492,7 @@ footer a:hover { color: var(--accent); }
       </details>
 
       <div class="card-foot">
-        <a class="open" href="apps/invoice/">さわってみる
+        <a class="open" href="apps/invoice/">デモを開く
           <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
         </a>
       </div>
@@ -516,12 +516,12 @@ footer a:hover { color: var(--accent); }
       <dl class="story">
         <dt>困っていたこと</dt>
         <dd>入金の一覧を見ながら、領収書を1枚ずつ作っていました。月末に数十枚たまると、それだけで半日つぶれます。</dd>
-        <dt>こうした</dt>
+        <dt>解決したこと</dt>
         <dd>入金の一覧をコピーして<strong>貼り付けるだけで、必要な枚数をまとめて作ります</strong>。A4の紙に2枚ずつ並んだ形で出てくるので、印刷して切るだけ。会社名や但し書きは、発行元ごとに切り替えられます。</dd>
       </dl>
 
       <ul class="tags">
-        <li>貼り付けて一度に作成</li><li>印刷してすぐ渡せる</li><li>発行元ごとに切り替え</li>
+        <li>貼り付けて一括作成</li><li>印刷用のPDFを出力</li><li>発行元ごとに切り替え</li>
       </ul>
 
       <details class="tech">
@@ -530,7 +530,7 @@ footer a:hover { color: var(--accent); }
       </details>
 
       <div class="card-foot">
-        <a class="open" href="apps/receipt/">さわってみる
+        <a class="open" href="apps/receipt/">デモを開く
           <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
         </a>
       </div>
@@ -555,12 +555,12 @@ footer a:hover { color: var(--accent); }
       <dl class="story">
         <dt>困っていたこと</dt>
         <dd>合宿の見積もりを表計算ソフトで作っていましたが、2人で同時に触ると計算式が壊れ、どれが最新か分からなくなっていました。</dd>
-        <dt>こうした</dt>
+        <dt>解決したこと</dt>
         <dd>宿の部屋数や食事の回数を変えた案を何通りか作り、<strong>「どの案なら黒字か」「何人集まれば元が取れるか」を並べて見比べられます</strong>。案をひとつ決めたら予算として固定し、終わったあとに実際かかった額を入れて差を確認。2人が同時に開いても、片方の入力がすぐもう片方の画面に出ます。</dd>
       </dl>
 
       <ul class="tags">
-        <li>案を並べて見比べ</li><li>何人で元が取れるか計算</li><li>2人で同時に編集</li><li>自動で保存</li>
+        <li>複数の案を並べて比較</li><li>損益分岐点を自動計算</li><li>2人で同時に編集</li><li>自動保存</li>
       </ul>
 
       <details class="tech">
@@ -569,7 +569,7 @@ footer a:hover { color: var(--accent); }
       </details>
 
       <div class="card-foot">
-        <a class="open" href="apps/event-budget/">さわってみる
+        <a class="open" href="apps/event-budget/">デモを開く
           <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
         </a>
       </div>
@@ -595,12 +595,12 @@ footer a:hover { color: var(--accent); }
       <dl class="story">
         <dt>困っていたこと</dt>
         <dd>カード4枚の請求メールがバラバラに届くうえ、締め日も引き落とし日も会社ごとに違います。結局ひと月にいくら使っているのか、分からないままでした。</dd>
-        <dt>こうした</dt>
+        <dt>解決したこと</dt>
         <dd>届いた請求メールを自動で読み取って集計し、<strong>「実際に引き落とされた月」にそろえてグラフにしました</strong>。締め日がずれるカードも、引き落としの月に合わせて数えています。何にいくら使ったかの内訳と、毎月自動で引き落とされている定額サービスの洗い出しも出ます。</dd>
       </dl>
 
       <ul class="tags">
-        <li>メールから自動で集計</li><li>グラフで見える化</li><li>使い道の内訳</li><li>定額サービスの洗い出し</li>
+        <li>メールから自動集計</li><li>グラフで推移を比較</li><li>使い道の内訳</li><li>定額サービスの検出</li>
       </ul>
 
       <details class="tech">
@@ -609,7 +609,7 @@ footer a:hover { color: var(--accent); }
       </details>
 
       <div class="card-foot">
-        <a class="open" href="apps/card-dashboard/">さわってみる
+        <a class="open" href="apps/card-dashboard/">デモを開く
           <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
         </a>
       </div>
@@ -618,17 +618,17 @@ footer a:hover { color: var(--accent); }
   </main>
 
   <section class="note">
-    <h3>お試し版について</h3>
+    <h3>デモ版について</h3>
     <ul>
       <li>出てくる会社名・人の名前・金額は<strong>すべて架空</strong>です。実在の人や会社、実際の取引とは関係ありません。</li>
       <li>ログインは要りません。入力した内容がどこかに送られることはなく、<strong>ご覧の端末の中だけ</strong>に残ります。</li>
-      <li>画面の上にある「初期状態に戻す」を押せば、いつでも最初のサンプルに戻ります。自由に触ってみてください。</li>
-      <li>仕事で実際に使っているものとは別のコピーです。本物のデータは一切入っていません。</li>
+      <li>画面上部の「初期状態に戻す」を押せば、いつでも最初のサンプルに戻ります。遠慮なく操作してください。</li>
+      <li>業務で実際に使っているものとは別のコピーです。本物のデータは一切入っていません。</li>
     </ul>
   </section>
 
   <footer>
-    中身のプログラムはこちらで公開しています ——
+    プログラムの中身はこちらで公開しています：
     <a href="https://github.com/knt1234/portfolio">github.com/knt1234/portfolio</a>
   </footer>
 
