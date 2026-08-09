@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>つくったもの｜毎月の事務作業を置き換えた業務アプリ</title>
-<meta name="description" content="請求書の作成、領収書の発行、イベントの収支管理、クレジットカードの支出把握。毎月くり返していた事務作業を、自作のアプリに置き換えました。ログイン不要で操作できるデモを公開しています。">
+<title>つくったもの｜業務アプリと情報デザイン</title>
+<meta name="description" content="請求書の作成、領収書の発行、イベントの収支管理、クレジットカードの支出把握、チラシの情報設計。業務の仕組みと、伝わる情報のかたちをつくっています。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧰</text></svg>">
 <style>
 /* ============================================================
@@ -448,13 +448,12 @@ footer a:hover { color: var(--accent); }
 
   <header class="masthead rise">
     <span class="eyebrow"><span class="dot" aria-hidden="true"></span>つくったもの</span>
-    <h1>毎月くり返していた事務作業を、<br>自作のアプリに置き換えました。</h1>
+    <h1>業務の仕組みと、<br>伝わる情報のかたちをつくっています。</h1>
     <p class="lede">
       請求書の作成、領収書の発行、イベントの収支管理、クレジットカードの支出把握。
-      いずれも毎月発生し、そのたびに時間を取られていた業務です。
-      ここに掲載しているのは、実際の業務で使っているものを、
-      中身だけ<strong>架空のデータに入れ替えたデモ版</strong>です。
-      登録もログインも不要で、開いてすぐ操作できます。
+      そして、選ぶ・申し込むために必要な情報を整理するチラシ制作。
+      毎月の手間を減らす<strong>業務アプリ</strong>と、迷わず内容を理解できる
+      <strong>情報デザイン</strong>を、目的から組み立てています。
     </p>
   </header>
 
@@ -615,15 +614,91 @@ footer a:hover { color: var(--accent); }
       </div>
     </article>
 
+    <!-- ============ IBASHO flyer ============ -->
+    <article class="card rise">
+      <div class="card-head">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 3h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/>
+            <path d="M8 8h8M8 12h8M8 16h5"/>
+          </svg>
+        </span>
+        <div>
+          <h2>IBASHO ランチプラン</h2>
+          <p class="card-kicker">ホテルの選択肢を、1枚で伝えるチラシ</p>
+        </div>
+      </div>
+
+      <dl class="story">
+        <dt>目的</dt>
+        <dd>ランチとホテル最上階ラウンジを組み合わせたプランを、<strong>価格・利用時間・選べるレストラン</strong>までひと目で把握できるように整理しました。</dd>
+        <dt>設計</dt>
+        <dd>上質で落ち着いた滞在イメージを起点に、プラン比較、利用メリット、予約導線を上から順に配置。A4一枚で、内容の理解から行動までをつなげています。</dd>
+      </dl>
+
+      <ul class="tags">
+        <li>A4チラシ</li><li>情報設計</li><li>比較の見せ方</li><li>予約導線</li>
+      </ul>
+
+      <details class="tech">
+        <summary>制作方法</summary>
+        <p>HTML / CSSでA4レイアウトを設計し、PDFと画像に書き出し。読みやすさを保ちながら、写真と料金・条件の優先順位を設計しました。</p>
+      </details>
+
+      <div class="card-foot">
+        <a class="open" href="works/ibasho/">作品を見る
+          <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+        </a>
+      </div>
+    </article>
+
+    <!-- ============ Baseball flyer ============ -->
+    <article class="card rise">
+      <div class="card-head">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="8.5"/>
+            <path d="M7.5 5.5c1.8 1.8 2.8 4 2.8 6.5s-1 4.7-2.8 6.5M16.5 5.5c-1.8 1.8-2.8 4-2.8 6.5s1 4.7 2.8 6.5"/>
+          </svg>
+        </span>
+        <div>
+          <h2>東京ドーム 野球観戦</h2>
+          <p class="card-kicker">2試合の選びやすさをつくる比較チラシ</p>
+        </div>
+      </div>
+
+      <dl class="story">
+        <dt>目的</dt>
+        <dd>対戦カード、日程、座席と価格、来場特典が異なる2試合を、<strong>どちらが自分に合うか比較して選べる</strong>一枚にまとめました。</dd>
+        <dt>設計</dt>
+        <dd>左右で情報の構造をそろえ、チームごとの色で瞬時に区別。価格は席種ごとに縦に並べ、チケットの条件と注意点をカード下部に分離しています。</dd>
+      </dl>
+
+      <ul class="tags">
+        <li>A4チラシ</li><li>比較表現</li><li>情報の優先順位</li><li>イベント案内</li>
+      </ul>
+
+      <details class="tech">
+        <summary>制作方法</summary>
+        <p>HTML / CSSでA4レイアウトを設計し、PDFと画像に書き出し。複数の公式情報を比較しやすい共通フォーマットに再構成しました。</p>
+      </details>
+
+      <div class="card-foot">
+        <a class="open" href="works/baseball/">作品を見る
+          <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+        </a>
+      </div>
+    </article>
+
   </main>
 
   <section class="note">
     <h3>デモ版について</h3>
     <ul>
-      <li>掲載している社名・氏名・金額は<strong>すべて架空</strong>です。実在の個人・法人および実際の取引とは関係ありません。</li>
+      <li>業務アプリに掲載している社名・氏名・金額は<strong>すべて架空</strong>です。実在の個人・法人および実際の取引とは関係ありません。</li>
       <li>ログインは不要です。入力した内容は外部に送信されず、<strong>ご覧の端末内にのみ</strong>保存されます。</li>
       <li>画面上部の「初期状態に戻す」で、いつでもサンプルデータの状態に戻せます。</li>
-      <li>実際に稼働しているものとは別のコピーで、実データは含まれていません。</li>
+      <li>業務アプリは実際に稼働しているものとは別のコピーで、実データは含まれていません。チラシはポートフォリオ用の制作物です。</li>
     </ul>
   </section>
 

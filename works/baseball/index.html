@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>東京ドーム 野球観戦｜ポートフォリオ</title>
+<style>
+  :root { color-scheme: light dark; --page: #f2f2ef; --surface: #fff; --ink: #17243a; --muted: #687386; --line: #d4d9e0; --accent: #184d86; }
+  @media (prefers-color-scheme: dark) { :root { --page: #11161e; --surface: #1c2532; --ink: #f0f4fa; --muted: #b1bdcd; --line: #384454; --accent: #83b7f2; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 16px/1.7 system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; }
+  main { width: min(100% - 32px, 940px); margin: 0 auto; padding: 36px 0 64px; }
+  a { color: inherit; }
+  .back { color: var(--muted); font-size: .9rem; text-underline-offset: .25em; }
+  header { margin: 30px 0 24px; }
+  .eyebrow { margin: 0 0 8px; color: var(--accent); font-size: .78rem; font-weight: 700; letter-spacing: .1em; }
+  h1 { margin: 0; font-size: clamp(1.7rem, 5vw, 2.7rem); letter-spacing: -.03em; line-height: 1.25; }
+  .lede { max-width: 48rem; color: var(--muted); }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 22px 0 28px; }
+  .button { display: inline-block; padding: 9px 15px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); font-weight: 650; text-decoration: none; }
+  .button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  figure { margin: 0; padding: clamp(8px, 2vw, 18px); border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+  figure img { display: block; width: 100%; height: auto; box-shadow: 0 3px 18px rgb(0 0 0 / .14); }
+  figcaption { padding: 12px 4px 2px; color: var(--muted); font-size: .84rem; }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="../../">← ポートフォリオへ戻る</a>
+  <header>
+    <p class="eyebrow">INFORMATION DESIGN / A4 FLYER</p>
+    <h1>夏の東京ドーム 野球観戦チケット比較</h1>
+    <p class="lede">日程、対戦カード、席種と価格、来場特典が異なる2試合を、観戦する人が自分に合う方を比較して選べるようにまとめたチラシです。</p>
+  </header>
+  <div class="actions">
+    <a class="button primary" href="baseball_ticket_comparison.pdf" target="_blank">PDFを開く</a>
+    <a class="button" href="https://www.buffaloes.co.jp/news/detail/202600731783.html" target="_blank" rel="noopener">バファローズ公式告知</a>
+    <a class="button" href="https://www.seibulions.jp/news/detail/202600668682.html" target="_blank" rel="noopener">ライオンズ公式告知</a>
+  </div>
+  <figure>
+    <img src="baseball_ticket_comparison.png" alt="夏の東京ドーム野球観戦チケット比較のA4チラシ">
+    <figcaption>掲載価格・内容は制作時点の公式告知に基づくポートフォリオ作品です。</figcaption>
+  </figure>
+</main>
+</body>
+</html>
