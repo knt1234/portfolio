@@ -3,207 +3,346 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>つくったもの — 業務アプリのポートフォリオ</title>
-<meta name="description" content="自分の業務課題を解決するために作ったWebアプリとダッシュボードのデモ集。請求書作成・領収書発行・イベント収支管理・クレジットカード支出ダッシュボード。">
+<title>つくったもの — 毎月の手作業をアプリにしました</title>
+<meta name="description" content="請求書づくり、領収書の発行、イベントの収支管理、クレジットカードの支出把握。毎月くり返していた手作業を、自分でアプリにしてきました。ログイン不要で触れるデモです。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧰</text></svg>">
 <style>
 /* ============================================================
-   配色
+   1. 配色とトークン
    ------------------------------------------------------------
-   ライト／ダークの両方で成立させる。閲覧者のOS設定に従う。
+   閲覧者のOSの明暗設定にそのまま従う。
+   影・境界・面の3層で奥行きを作り、色は最小限にとどめる。
    ============================================================ */
 :root {
   color-scheme: light dark;
 
-  --page:      #f7f7f4;
-  --surface:   #ffffff;
-  --surface-2: #fbfbf9;
-  --ink:       #16181c;
-  --ink-2:     #4c5158;
-  --ink-3:     #83888f;
-  --line:      rgba(20, 22, 26, .10);
-  --line-2:    rgba(20, 22, 26, .06);
-  --accent:    #1f6feb;
-  --accent-ink:#ffffff;
-  --shadow-sm: 0 1px 2px rgba(16, 18, 22, .05);
-  --shadow-md: 0 1px 2px rgba(16, 18, 22, .05), 0 10px 28px rgba(16, 18, 22, .07);
-  --shadow-lg: 0 2px 4px rgba(16, 18, 22, .06), 0 18px 44px rgba(16, 18, 22, .11);
+  --page:        #f2f2ef;
+  --wash-a:      rgba(31, 111, 235, .07);
+  --wash-b:      rgba(120, 90, 200, .05);
 
-  --ease-out:    cubic-bezier(.16, 1, .3, 1);
+  --surface:     rgba(255, 255, 255, .72);
+  --surface-2:   rgba(255, 255, 255, .55);
+  --edge-top:    rgba(255, 255, 255, .9);
+
+  --ink:         #14161a;
+  --ink-2:       #474c54;
+  --ink-3:       #7b818a;
+
+  --line:        rgba(20, 22, 26, .09);
+  --line-2:      rgba(20, 22, 26, .055);
+
+  --accent:      #1668e3;
+  --accent-soft: rgba(22, 104, 227, .10);
+  --accent-ink:  #ffffff;
+
+  --shadow-1: 0 1px 2px rgba(16, 18, 22, .05);
+  --shadow-2: 0 1px 2px rgba(16, 18, 22, .05), 0 12px 30px rgba(16, 18, 22, .07);
+  --shadow-3: 0 2px 5px rgba(16, 18, 22, .07), 0 22px 52px rgba(16, 18, 22, .12);
+
+  --blur: blur(24px) saturate(180%);
+
+  /* 減衰しきったばね。行きすぎず、すっと止まる */
   --ease-spring: cubic-bezier(.32, .72, 0, 1);
+  --ease-out:    cubic-bezier(.16, 1, .3, 1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --page:      #0e0f11;
-    --surface:   #17191d;
-    --surface-2: #1c1f23;
-    --ink:       #f2f3f5;
-    --ink-2:     #b6bbc2;
-    --ink-3:     #838a93;
-    --line:      rgba(255, 255, 255, .11);
-    --line-2:    rgba(255, 255, 255, .06);
-    --accent:    #6ea8ff;
-    --accent-ink:#0e0f11;
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
-    --shadow-md: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 28px rgba(0, 0, 0, .35);
-    --shadow-lg: 0 2px 4px rgba(0, 0, 0, .45), 0 18px 44px rgba(0, 0, 0, .45);
+    --page:        #0c0d0f;
+    --wash-a:      rgba(80, 140, 255, .10);
+    --wash-b:      rgba(150, 120, 255, .07);
+
+    --surface:     rgba(30, 33, 38, .72);
+    --surface-2:   rgba(38, 42, 48, .55);
+    --edge-top:    rgba(255, 255, 255, .10);
+
+    --ink:         #f4f5f7;
+    --ink-2:       #b9bec6;
+    --ink-3:       #868d97;
+
+    --line:        rgba(255, 255, 255, .10);
+    --line-2:      rgba(255, 255, 255, .06);
+
+    --accent:      #74acff;
+    --accent-soft: rgba(116, 172, 255, .14);
+    --accent-ink:  #0c0d0f;
+
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, .45);
+    --shadow-2: 0 1px 2px rgba(0, 0, 0, .45), 0 12px 30px rgba(0, 0, 0, .38);
+    --shadow-3: 0 2px 5px rgba(0, 0, 0, .5), 0 22px 52px rgba(0, 0, 0, .5);
+  }
+}
+
+/* 透明度を控える設定の人には、すりガラスをやめて不透明にする */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --surface: Canvas;
+    --surface-2: Canvas;
+    --blur: none;
+  }
+  body::before { display: none; }
+}
+
+/* コントラストを上げる設定の人には、面を締めて境界をはっきりさせる */
+@media (prefers-contrast: more) {
+  :root {
+    --surface: Canvas;
+    --surface-2: Canvas;
+    --line: CanvasText;
+    --blur: none;
+    --ink-2: CanvasText;
   }
 }
 
 * { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
-html { -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
 
 body {
   margin: 0;
+  min-height: 100%;
   background: var(--page);
   color: var(--ink);
-  font: 100%/1.7 system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  /* 端末の標準フォントを使う。字形も字間も、その端末向けに調整済みのため */
+  font: 100%/1.75 system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
   font-size: 16px;
-  letter-spacing: .01em;
+  letter-spacing: .012em;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* すりガラスの下に敷く、ごく淡い光。面に厚みを感じさせるため */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(70rem 40rem at 12% -8%, var(--wash-a), transparent 62%),
+    radial-gradient(60rem 38rem at 92% 4%, var(--wash-b), transparent 60%);
 }
 
 .wrap {
-  max-width: 1080px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: clamp(2.5rem, 7vw, 5.5rem) clamp(1.25rem, 4vw, 2.5rem) 5rem;
+  padding: clamp(3rem, 8vw, 6.5rem) clamp(1.25rem, 4vw, 2.5rem) 6rem;
 }
 
-/* ---------- ヘッダー ---------- */
-.masthead { margin-bottom: clamp(2.5rem, 6vw, 4rem); }
+/* ============================================================
+   2. 導入
+   ============================================================ */
+/* 幅の指定に ch は使わない。日本語では「0」の字幅が基準になり、
+   想定の半分ほどの幅になってしまうため。rem で決め打つ。 */
+.masthead {
+  max-width: 52rem;
+  margin-bottom: clamp(2.75rem, 7vw, 4.5rem);
+}
 
 .eyebrow {
-  display: inline-block;
-  margin: 0 0 1rem;
-  padding: .3rem .75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  margin: 0 0 1.15rem;
+  padding: .34rem .8rem .34rem .55rem;
   border: 1px solid var(--line);
+  border-top-color: var(--edge-top);
   border-radius: 999px;
   background: var(--surface);
-  box-shadow: var(--shadow-sm);
-  font-size: .75rem;
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  box-shadow: var(--shadow-1);
+  font-size: .78rem;
   font-weight: 600;
-  letter-spacing: .06em;
+  letter-spacing: .01em;
   color: var(--ink-2);
+}
+.eyebrow .dot {
+  width: .45rem; height: .45rem;
+  border-radius: 50%;
+  background: var(--accent);
 }
 
 h1 {
-  margin: 0 0 .75rem;
-  font-size: clamp(2rem, 5.5vw, 3.25rem);
+  margin: 0 0 1.1rem;
+  font-size: clamp(1.78rem, 4.6vw, 3.05rem);
   font-weight: 700;
-  /* 大きい文字ほど字間は詰める */
-  letter-spacing: -.025em;
-  line-height: 1.1;
+  /* 文字が大きくなるほど字間は空いて見えるので、その分を詰める */
+  letter-spacing: -.03em;
+  line-height: 1.24;
+  /* 各行の長さをそろえ、末尾に1〜2文字だけ残るのを避ける */
+  text-wrap: balance;
+}
+
+/* 狭い画面では、決め打ちの改行をやめて自然に折り返させる */
+@media (max-width: 40rem) {
+  h1 br { display: none; }
 }
 
 .lede {
   margin: 0;
-  max-width: 46ch;
-  font-size: clamp(1rem, 2.2vw, 1.125rem);
-  line-height: 1.75;
+  max-width: 38rem;
+  font-size: clamp(1.02rem, 2.1vw, 1.13rem);
+  line-height: 1.9;
   color: var(--ink-2);
+  text-wrap: pretty;
 }
+.lede strong { color: var(--ink); font-weight: 650; }
 
-/* ---------- カードのグリッド ---------- */
+/* ============================================================
+   3. カード
+   ============================================================ */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-  gap: clamp(1rem, 2.5vw, 1.5rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 23rem), 1fr));
+  gap: clamp(1rem, 2.2vw, 1.4rem);
 }
 
 .card {
   display: flex;
   flex-direction: column;
-  padding: clamp(1.4rem, 3vw, 1.9rem);
+  padding: clamp(1.5rem, 3vw, 2rem);
   border: 1px solid var(--line);
-  border-radius: 18px;
+  /* 上辺だけ明るくして、面に光が当たっているように見せる */
+  border-top-color: var(--edge-top);
+  border-radius: 20px;
   background: var(--surface);
-  box-shadow: var(--shadow-md);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  box-shadow: var(--shadow-2);
   transition:
-    transform 380ms var(--ease-spring),
-    box-shadow 380ms var(--ease-spring),
-    border-color 380ms var(--ease-out);
+    transform 420ms var(--ease-spring),
+    box-shadow 420ms var(--ease-spring),
+    border-color 420ms var(--ease-out);
 }
 
 @media (hover: hover) {
   .card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
-    border-color: rgba(31, 111, 235, .28);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-3);
+    border-color: color-mix(in srgb, var(--accent) 26%, var(--line));
+  }
+  .card:hover .icon {
+    background: var(--accent-soft);
+    transform: scale(1.04);
   }
 }
 
 .card-head {
   display: flex;
   align-items: center;
-  gap: .8rem;
-  margin-bottom: 1rem;
+  gap: .85rem;
+  margin-bottom: 1.35rem;
 }
 
 .icon {
   flex: none;
   display: grid;
   place-items: center;
-  width: 2.6rem;
-  height: 2.6rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border: 1px solid var(--line-2);
-  border-radius: 12px;
+  border-radius: 13px;
   background: var(--surface-2);
   color: var(--accent);
+  transition: background 420ms var(--ease-out), transform 420ms var(--ease-spring);
 }
-.icon svg { width: 1.3rem; height: 1.3rem; }
+.icon svg { width: 1.35rem; height: 1.35rem; }
 
 h2 {
   margin: 0;
-  font-size: 1.15rem;
-  font-weight: 650;
-  letter-spacing: -.01em;
+  font-size: 1.2rem;
+  font-weight: 660;
+  letter-spacing: -.015em;
   line-height: 1.35;
 }
-
-.card-sub {
-  margin: .15rem 0 0;
+.card-kicker {
+  margin: .1rem 0 0;
   font-size: .8rem;
+  font-weight: 500;
   color: var(--ink-3);
-  letter-spacing: .02em;
+  letter-spacing: .005em;
 }
 
-/* 課題 → つくったもの */
-.story { margin: 0 0 1.25rem; }
+/* 困っていたこと → こうした */
+.story { margin: 0 0 1.4rem; }
 
 .story dt {
-  margin-bottom: .2rem;
-  font-size: .7rem;
-  font-weight: 700;
-  letter-spacing: .1em;
+  display: inline-block;
+  margin-bottom: .35rem;
+  padding: .12rem .5rem;
+  border-radius: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-2);
+  font-size: .72rem;
+  font-weight: 650;
+  letter-spacing: .04em;
   color: var(--ink-3);
 }
 .story dd {
-  margin: 0 0 .9rem;
-  font-size: .9rem;
-  line-height: 1.75;
+  margin: 0 0 1.15rem;
+  font-size: .925rem;
+  line-height: 1.85;
   color: var(--ink-2);
 }
 .story dd:last-child { margin-bottom: 0; }
+.story dd strong { color: var(--ink); font-weight: 620; }
 
 .tags {
   display: flex;
   flex-wrap: wrap;
   gap: .4rem;
-  margin: 0 0 1.35rem;
+  margin: 0 0 1.5rem;
   padding: 0;
   list-style: none;
 }
 .tags li {
-  padding: .22rem .6rem;
+  padding: .26rem .65rem;
   border: 1px solid var(--line-2);
-  border-radius: 7px;
+  border-radius: 8px;
   background: var(--surface-2);
-  font-size: .72rem;
+  font-size: .755rem;
+  font-weight: 500;
   letter-spacing: .015em;
   color: var(--ink-2);
-  white-space: nowrap;
+}
+
+/* 技術の話は、読みたい人だけが開ければよい。ひと段深いところに置く */
+.tech {
+  margin: 0 0 1.5rem;
+  border-top: 1px solid var(--line-2);
+  padding-top: .9rem;
+}
+.tech summary {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .78rem;
+  font-weight: 550;
+  color: var(--ink-3);
+  cursor: pointer;
+  list-style: none;
+  transition: color 220ms var(--ease-out);
+}
+.tech summary::-webkit-details-marker { display: none; }
+.tech summary::before {
+  content: "";
+  width: .32rem; height: .32rem;
+  border-right: 1.6px solid currentColor;
+  border-bottom: 1.6px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 300ms var(--ease-spring);
+}
+.tech[open] summary::before { transform: rotate(45deg); }
+.tech summary:hover { color: var(--ink-2); }
+.tech p {
+  margin: .7rem 0 0;
+  font-size: .8rem;
+  line-height: 1.8;
+  color: var(--ink-3);
 }
 
 .card-foot { margin-top: auto; }
@@ -211,53 +350,95 @@ h2 {
 .open {
   display: inline-flex;
   align-items: center;
-  gap: .45rem;
-  padding: .6rem 1.1rem;
-  border-radius: 10px;
+  gap: .5rem;
+  padding: .68rem 1.2rem;
+  border-radius: 11px;
   background: var(--accent);
   color: var(--accent-ink);
-  font-size: .875rem;
-  font-weight: 600;
+  font-size: .9rem;
+  font-weight: 620;
+  letter-spacing: .005em;
   text-decoration: none;
-  /* 押した瞬間に反応させる。離してからでは遅い */
-  transition: transform 110ms var(--ease-out), box-shadow 240ms var(--ease-out), filter 240ms var(--ease-out);
+  box-shadow: 0 1px 2px rgba(16, 18, 22, .12);
+  /* 指を離してからでは遅い。押した瞬間に返す */
+  transition: transform 110ms var(--ease-out), box-shadow 260ms var(--ease-out), filter 260ms var(--ease-out);
 }
-.open:hover { box-shadow: 0 6px 18px rgba(31, 111, 235, .3); filter: brightness(1.06); }
-.open:active { transform: scale(.97); transition-duration: 70ms; }
-.open svg { width: .8rem; height: .8rem; }
+.open:hover { box-shadow: 0 8px 22px color-mix(in srgb, var(--accent) 34%, transparent); filter: brightness(1.07); }
+.open:active { transform: scale(.968); transition-duration: 70ms; }
+.open:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.open .arr { transition: transform 340ms var(--ease-spring); }
+.open:hover .arr { transform: translateX(3px); }
+.open svg { width: .82rem; height: .82rem; }
 
-/* ---------- 注記 ---------- */
+/* ============================================================
+   4. 注記とフッター
+   ============================================================ */
 .note {
-  margin: clamp(2.5rem, 6vw, 4rem) 0 0;
-  padding: 1.25rem 1.4rem;
+  margin: clamp(2.75rem, 6vw, 4rem) 0 0;
+  padding: 1.5rem 1.65rem;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-top-color: var(--edge-top);
+  border-radius: 16px;
   background: var(--surface-2);
-  font-size: .85rem;
-  line-height: 1.8;
-  color: var(--ink-2);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  box-shadow: var(--shadow-1);
 }
 .note h3 {
-  margin: 0 0 .5rem;
-  font-size: .8rem;
-  font-weight: 700;
-  letter-spacing: .06em;
+  margin: 0 0 .7rem;
+  font-size: .95rem;
+  font-weight: 650;
+  letter-spacing: -.005em;
   color: var(--ink);
 }
 .note ul { margin: 0; padding-left: 1.15rem; }
-.note li { margin-bottom: .25rem; }
+.note li {
+  margin-bottom: .4rem;
+  font-size: .875rem;
+  line-height: 1.8;
+  color: var(--ink-2);
+}
 .note li:last-child { margin-bottom: 0; }
+.note strong { color: var(--ink); font-weight: 620; }
 
 footer {
-  margin-top: 2.5rem;
-  font-size: .8rem;
+  margin-top: 2.75rem;
+  font-size: .82rem;
   color: var(--ink-3);
 }
-footer a { color: inherit; }
+footer a {
+  color: var(--ink-2);
+  text-decoration-color: var(--line);
+  text-underline-offset: .25em;
+}
+footer a:hover { color: var(--accent); }
+
+/* ============================================================
+   5. 登場のしかた
+   ------------------------------------------------------------
+   届いた順に、ごく短く持ち上げながら現れる。
+   動きを控える設定の人には、この演出ごと出さない。
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: rise 620ms var(--ease-spring) forwards;
+  }
+  .rise:nth-child(1) { animation-delay: 60ms; }
+  .rise:nth-child(2) { animation-delay: 130ms; }
+  .rise:nth-child(3) { animation-delay: 200ms; }
+  .rise:nth-child(4) { animation-delay: 270ms; }
+  .masthead.rise { animation-delay: 0ms; }
+}
+
+@keyframes rise {
+  to { opacity: 1; transform: none; }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .card, .open { transition-duration: 1ms !important; }
-  .card:hover, .open:active { transform: none; }
+  .card, .open, .icon, .arr, .tech summary::before { transition-duration: 1ms !important; }
+  .card:hover, .open:active, .icon { transform: none !important; }
 }
 </style>
 </head>
@@ -265,124 +446,140 @@ footer a { color: inherit; }
 
 <div class="wrap">
 
-  <header class="masthead">
-    <!-- ▼ お名前・肩書きはここを書き換えてください -->
-    <span class="eyebrow">PORTFOLIO</span>
-    <h1>自分の業務を、自分で作って軽くする。</h1>
+  <header class="masthead rise">
+    <span class="eyebrow"><span class="dot" aria-hidden="true"></span>つくったもの</span>
+    <h1>毎月くり返していた手作業を、<br>ひとつずつアプリにしました。</h1>
     <p class="lede">
-      毎月くり返していた手作業を、その都度Webアプリにしてきました。
-      ここに置いてあるのは、実際に業務で使っているものを、
-      架空のデータに入れ替えた<strong>デモ版</strong>です。ログイン不要で、そのまま触れます。
+      請求書づくり、領収書の発行、イベントのお金の管理、クレジットカードの支出把握。
+      どれも「面倒だな」と思いながら毎月やっていたことです。
+      ここに置いてあるのは、実際に仕事で使っているものを、
+      中身を<strong>架空のデータに入れ替えたお試し版</strong>。
+      登録もログインも要りません。押せば、そのまま動きます。
     </p>
   </header>
 
   <main class="grid">
 
     <!-- ============ 請求書 ============ -->
-    <article class="card">
+    <article class="card rise">
       <div class="card-head">
         <span class="icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/>
           </svg>
         </span>
         <div>
-          <h2>請求書作成</h2>
-          <p class="card-sub">Invoice Studio</p>
+          <h2>請求書づくり</h2>
+          <p class="card-kicker">毎月の請求を、選ぶだけに</p>
         </div>
       </div>
 
       <dl class="story">
-        <dt>課題</dt>
-        <dd>毎月、前月の請求書ファイルを複製して日付と金額を書き換えていた。源泉徴収税の計算を手でやるため、たまに間違える。</dd>
-        <dt>つくったもの</dt>
-        <dd>取引先を登録しておけば、選んで品目を入れるだけで請求書ができる。源泉徴収税・複数税率・インボイス経過措置の控除まで自動計算し、そのままPDFに書き出す。発行履歴から入金済み／未入金も追える。</dd>
+        <dt>困っていたこと</dt>
+        <dd>毎月、前の月の請求書ファイルをコピーして、日付と金額を書き換えていました。税金の差し引きを電卓で計算するので、たまに間違えます。</dd>
+        <dt>こうした</dt>
+        <dd>取引先を一度登録しておけば、あとは<strong>選んで金額を入れるだけ</strong>。消費税と源泉徴収の差し引きまで自動で計算して、そのまま印刷できる形で書き出します。出した請求書は一覧に残り、入金が済んだかどうかもひと目で分かります。</dd>
       </dl>
 
       <ul class="tags">
-        <li>HTML / CSS / JavaScript</li><li>jsPDF</li><li>localStorage</li><li>ビルド不要</li>
+        <li>印刷できる形で書き出し</li><li>税金の計算は自動</li><li>入金の管理</li><li>スマホでも使える</li>
       </ul>
 
+      <details class="tech">
+        <summary>使っている技術</summary>
+        <p>HTML / CSS / JavaScript のみ。PDF生成に jsPDF、保存はブラウザの localStorage。ビルド工程なしの静的ファイル1枚で完結。</p>
+      </details>
+
       <div class="card-foot">
-        <a class="open" href="apps/invoice/">デモを開く
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        <a class="open" href="apps/invoice/">さわってみる
+          <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
         </a>
       </div>
     </article>
 
     <!-- ============ 領収書 ============ -->
-    <article class="card">
+    <article class="card rise">
       <div class="card-head">
         <span class="icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 2v20l2.5-1.5L9 22l2.5-1.5L14 22l2.5-1.5L19 22V2l-2.5 1.5L14 2l-2.5 1.5L9 2 6.5 3.5z"/>
             <path d="M8 8h8"/><path d="M8 12h8"/>
           </svg>
         </span>
         <div>
-          <h2>領収書発行</h2>
-          <p class="card-sub">Receipt Generator</p>
+          <h2>領収書の発行</h2>
+          <p class="card-kicker">数十枚を、貼り付けて一度に</p>
         </div>
       </div>
 
       <dl class="story">
-        <dt>課題</dt>
-        <dd>入金一覧を見ながら、領収書を1枚ずつ作っていた。月末に数十枚たまると半日仕事になる。</dd>
-        <dt>つくったもの</dt>
-        <dd>入金明細のテキストを貼り付けると、日付・氏名・金額・支払方法を読み取ってまとめて作成。A4に2枚ずつ並べた1つのPDFで出力し、そのまま印刷して切るだけにした。発行会社ごとにインボイス登録番号と但し書きを切り替えられる。</dd>
+        <dt>困っていたこと</dt>
+        <dd>入金の一覧を見ながら、領収書を1枚ずつ作っていました。月末に数十枚たまると、それだけで半日つぶれます。</dd>
+        <dt>こうした</dt>
+        <dd>入金の一覧をコピーして<strong>貼り付けるだけで、必要な枚数をまとめて作ります</strong>。A4の紙に2枚ずつ並んだ形で出てくるので、印刷して切るだけ。会社名や但し書きは、発行元ごとに切り替えられます。</dd>
       </dl>
 
       <ul class="tags">
-        <li>HTML / CSS / JavaScript</li><li>html2canvas</li><li>jsPDF</li><li>Firebase Auth（実運用版）</li>
+        <li>貼り付けて一度に作成</li><li>印刷してすぐ渡せる</li><li>発行元ごとに切り替え</li>
       </ul>
 
+      <details class="tech">
+        <summary>使っている技術</summary>
+        <p>HTML / CSS / JavaScript。画面を html2canvas で画像化し jsPDF で1つのPDFに結合。実際に使っている版は Firebase Authentication で利用者を限定。</p>
+      </details>
+
       <div class="card-foot">
-        <a class="open" href="apps/receipt/">デモを開く
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        <a class="open" href="apps/receipt/">さわってみる
+          <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
         </a>
       </div>
     </article>
 
     <!-- ============ イベント収支 ============ -->
-    <article class="card">
+    <article class="card rise">
       <div class="card-head">
         <span class="icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="4" width="18" height="18" rx="2"/>
             <path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>
             <path d="M8 17v-3"/><path d="M12 17v-5"/><path d="M16 17v-2"/>
           </svg>
         </span>
         <div>
-          <h2>イベント収支管理</h2>
-          <p class="card-sub">Event Budget</p>
+          <h2>イベントのお金の管理</h2>
+          <p class="card-kicker">黒字になる案を、見比べて決める</p>
         </div>
       </div>
 
       <dl class="story">
-        <dt>課題</dt>
-        <dd>合宿の見積もりをスプレッドシートで作っていたが、2人で編集すると数式が壊れ、どれが最新か分からなくなっていた。</dd>
-        <dt>つくったもの</dt>
-        <dd>宿泊・食事・会場などの条件を変えたプランを何案も作り、収支と損益分岐人数を並べて比較。採用した案を予算として固定し、開催後に実績を入れて差額を見る。2人が同時に開いても、入力した内容がすぐ相手の画面に反映される。</dd>
+        <dt>困っていたこと</dt>
+        <dd>合宿の見積もりを表計算ソフトで作っていましたが、2人で同時に触ると計算式が壊れ、どれが最新か分からなくなっていました。</dd>
+        <dt>こうした</dt>
+        <dd>宿の部屋数や食事の回数を変えた案を何通りか作り、<strong>「どの案なら黒字か」「何人集まれば元が取れるか」を並べて見比べられます</strong>。案をひとつ決めたら予算として固定し、終わったあとに実際かかった額を入れて差を確認。2人が同時に開いても、片方の入力がすぐもう片方の画面に出ます。</dd>
       </dl>
 
       <ul class="tags">
-        <li>HTML / CSS / JavaScript</li><li>Firebase Authentication</li><li>Cloud Firestore</li><li>Firebase Hosting</li>
+        <li>案を並べて見比べ</li><li>何人で元が取れるか計算</li><li>2人で同時に編集</li><li>自動で保存</li>
       </ul>
 
+      <details class="tech">
+        <summary>使っている技術</summary>
+        <p>Firebase Authentication（Googleログイン）＋ Cloud Firestore ＋ Firebase Hosting。onSnapshot による購読でリアルタイム同期。アプリ本体は約3,000行。</p>
+      </details>
+
       <div class="card-foot">
-        <a class="open" href="apps/event-budget/">デモを開く
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        <a class="open" href="apps/event-budget/">さわってみる
+          <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
         </a>
       </div>
     </article>
 
-    <!-- ============ クレカダッシュボード ============ -->
-    <article class="card">
+    <!-- ============ クレカ ============ -->
+    <article class="card rise">
       <div class="card-head">
         <span class="icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 3v18h18"/>
             <rect x="7" y="12" width="3" height="6" rx="1"/>
             <rect x="12.5" y="8" width="3" height="10" rx="1"/>
@@ -390,25 +587,30 @@ footer a { color: inherit; }
           </svg>
         </span>
         <div>
-          <h2>クレカ月次支出ダッシュボード</h2>
-          <p class="card-sub">Card Spending Dashboard</p>
+          <h2>カードの支出をひと目で</h2>
+          <p class="card-kicker">4枚をまとめて、月ごとに</p>
         </div>
       </div>
 
       <dl class="story">
-        <dt>課題</dt>
-        <dd>カード4枚の請求メールがバラバラに届くうえ、締め日も支払日も会社ごとに違う。結局ひと月にいくら使っているのか把握できていなかった。</dd>
-        <dt>つくったもの</dt>
-        <dd>請求メールを自動で集計し、「支払月」に基準をそろえて4枚を積み上げグラフで可視化。締め日がずれるカードは支払月に合わせて計上をずらしている。店舗名からのカテゴリ別内訳と、毎月くり返される定額課金の自動検出も付けた。</dd>
+        <dt>困っていたこと</dt>
+        <dd>カード4枚の請求メールがバラバラに届くうえ、締め日も引き落とし日も会社ごとに違います。結局ひと月にいくら使っているのか、分からないままでした。</dd>
+        <dt>こうした</dt>
+        <dd>届いた請求メールを自動で読み取って集計し、<strong>「実際に引き落とされた月」にそろえてグラフにしました</strong>。締め日がずれるカードも、引き落としの月に合わせて数えています。何にいくら使ったかの内訳と、毎月自動で引き落とされている定額サービスの洗い出しも出ます。</dd>
       </dl>
 
       <ul class="tags">
-        <li>HTML / CSS / JavaScript</li><li>SVG（グラフライブラリ不使用）</li><li>メール自動集計</li>
+        <li>メールから自動で集計</li><li>グラフで見える化</li><li>使い道の内訳</li><li>定額サービスの洗い出し</li>
       </ul>
 
+      <details class="tech">
+        <summary>使っている技術</summary>
+        <p>グラフ描画ライブラリを使わず、素の SVG を JavaScript で組み立て。メールからの抽出・集計は別途スクリプトで実行し、結果をこの画面に流し込む構成。</p>
+      </details>
+
       <div class="card-foot">
-        <a class="open" href="apps/card-dashboard/">デモを開く
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        <a class="open" href="apps/card-dashboard/">さわってみる
+          <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
         </a>
       </div>
     </article>
@@ -416,17 +618,18 @@ footer a { color: inherit; }
   </main>
 
   <section class="note">
-    <h3>デモについて</h3>
+    <h3>お試し版について</h3>
     <ul>
-      <li>表示される会社名・氏名・金額・取引は<strong>すべて架空</strong>です。実在の個人・企業・取引とは関係ありません。</li>
-      <li>ログインは不要です。入力した内容はサーバーに送られず、ご覧の端末のブラウザ内だけに保存されます。</li>
-      <li>各デモの上部にある「初期状態に戻す」で、いつでも最初のサンプルに戻せます。</li>
-      <li>実運用しているアプリとは別のコピーで、本番の接続情報や実データは含まれていません。</li>
+      <li>出てくる会社名・人の名前・金額は<strong>すべて架空</strong>です。実在の人や会社、実際の取引とは関係ありません。</li>
+      <li>ログインは要りません。入力した内容がどこかに送られることはなく、<strong>ご覧の端末の中だけ</strong>に残ります。</li>
+      <li>画面の上にある「初期状態に戻す」を押せば、いつでも最初のサンプルに戻ります。自由に触ってみてください。</li>
+      <li>仕事で実際に使っているものとは別のコピーです。本物のデータは一切入っていません。</li>
     </ul>
   </section>
 
   <footer>
-    ソースコード： <a href="https://github.com/knt1234/portfolio">github.com/knt1234/portfolio</a>
+    中身のプログラムはこちらで公開しています ——
+    <a href="https://github.com/knt1234/portfolio">github.com/knt1234/portfolio</a>
   </footer>
 
 </div>
