@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>請求書作成 / Invoice Studio</title>
+<title>請求書作成 / Invoice Studio（デモ）</title>
+<link rel="stylesheet" href="../../assets/demo-bar.css">
 <style>
   :root{
     --paper:#f4f5f2;
@@ -679,7 +680,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 <script>
 (function(){
 
-var STORAGE_PREFIX = "invoiceStudio:";
+var STORAGE_PREFIX = "invoiceStudioDemo:";
 function storageGet(key){
   try{ return localStorage.getItem(STORAGE_PREFIX+key); }catch(e){ return null; }
 }
@@ -1647,9 +1648,127 @@ async function downloadInvoicePdf(btn){
   }
 }
 
+/* ============================================================
+   デモ版のための追加コード
+   ------------------------------------------------------------
+   ここから下は、ポートフォリオ公開用のデモにするために
+   追加した部分です。実運用版には存在しません。
+
+   ・登場する人物・会社・金額・口座は、すべて架空のものです
+   ・データはこの端末のブラウザ内だけに保存されます
+   ・「初期状態に戻す」でいつでもサンプルデータに戻せます
+   ============================================================ */
+
+var DEMO_SEED_FLAG = "demoSeeded_v1";
+
+function demoSeedData(){
+  var issuer = {
+    name: "霧島 湊", kana: "キリシマ ミナト",
+    postal: "150-0000",
+    address: "架空県ナギサ市みなと3-2-1 サンプルビル402",
+    tel: "090-0000-0000",
+    email: "minato@example.com",
+    invoiceRegNo: "T9000000000001",
+    bankName: "さくら中央銀行", branchName: "みなと支店",
+    accountType: "普通", accountNumber: "0000001",
+    accountHolder: "キリシマ ミナト",
+    note: "振込手数料は貴社にてご負担をお願いいたします。"
+  };
+
+  var clients = [
+    { id:"demo-c1", name:"株式会社アオイソフト", honorific:"御中",
+      postal:"100-0000", address:"架空県ミドリ市青葉1-1-1 アオイタワー12F" },
+    { id:"demo-c2", name:"ミナトデザイン合同会社", honorific:"御中",
+      postal:"220-0000", address:"架空県ナギサ市港北2-14-8" },
+    { id:"demo-c3", name:"有限会社トキワ商会", honorific:"御中",
+      postal:"530-0000", address:"架空県トキワ市常盤町4-6" },
+    { id:"demo-c4", name:"株式会社ハルカゼ出版", honorific:"御中",
+      postal:"160-0000", address:"架空県ミドリ市春風5-3-2 ハルカゼビル7F" }
+  ];
+
+  function mkInvoice(o){
+    return {
+      id: o.id, invoiceNo: o.no, issueDate: o.issue, dueDate: o.due,
+      clientId: o.clientId, clientSnapshot: null,
+      inputMode: "excl", items: o.items,
+      withholdEnabled: !!o.withhold, withholdRate: 10.21, withholdManual: null,
+      invoiceDeductionEnabled: false, invoiceDeductionRate: 20,
+      subject: o.subject, note: "", status: o.status,
+      createdAt: o.issue + "T10:00:00.000Z"
+    };
+  }
+
+  var invoices = [
+    mkInvoice({
+      id:"demo-i1", no:"INV-202605-001", issue:"2026-05-29", due:"2026-06-30",
+      clientId:"demo-c1", subject:"2026年5月分 Web制作費", status:"paid", withhold:true,
+      items:[
+        {id:"demo-i1a", name:"コーポレートサイト リニューアル（デザイン）", qty:1, unit:"式", unitPrice:280000, taxRate:10},
+        {id:"demo-i1b", name:"CMS構築・記事移行", qty:1, unit:"式", unitPrice:120000, taxRate:10}
+      ]
+    }),
+    mkInvoice({
+      id:"demo-i2", no:"INV-202606-002", issue:"2026-06-28", due:"2026-07-31",
+      clientId:"demo-c2", subject:"2026年6月分 業務委託料", status:"paid", withhold:true,
+      items:[
+        {id:"demo-i2a", name:"UIデザイン顧問（月額）", qty:1, unit:"式", unitPrice:150000, taxRate:10},
+        {id:"demo-i2b", name:"追加バナー制作", qty:6, unit:"点", unitPrice:8000, taxRate:10}
+      ]
+    }),
+    mkInvoice({
+      id:"demo-i3", no:"INV-202607-003", issue:"2026-07-31", due:"2026-08-31",
+      clientId:"demo-c3", subject:"2026年7月分 保守運用費", status:"unpaid", withhold:false,
+      items:[
+        {id:"demo-i3a", name:"サーバー保守・監視（月額）", qty:1, unit:"式", unitPrice:45000, taxRate:10},
+        {id:"demo-i3b", name:"障害対応（時間精算）", qty:3.5, unit:"時間", unitPrice:12000, taxRate:10}
+      ]
+    }),
+    mkInvoice({
+      id:"demo-i4", no:"INV-202607-004", issue:"2026-07-31", due:"2026-08-31",
+      clientId:"demo-c4", subject:"書籍『架空入門』誌面デザイン", status:"unpaid", withhold:true,
+      items:[
+        {id:"demo-i4a", name:"本文レイアウト設計", qty:1, unit:"式", unitPrice:220000, taxRate:10},
+        {id:"demo-i4b", name:"図版作成", qty:24, unit:"点", unitPrice:6000, taxRate:10},
+        {id:"demo-i4c", name:"参考書籍（立替）", qty:1, unit:"式", unitPrice:4800, taxRate:8}
+      ]
+    })
+  ];
+
+  persist("issuer", issuer);
+  persist("clients", clients);
+  persist("invoices", invoices);
+  persist("counter", "5");
+  persist(DEMO_SEED_FLAG, "1");
+}
+
+function demoReset(){
+  if(!confirm("サンプルデータを入れ直して、最初の状態に戻します。\nこの画面で入力・編集した内容は消えます。よろしいですか？")) return;
+  ["issuer","clients","invoices","settings","counter",DEMO_SEED_FLAG].forEach(function(k){
+    try{ localStorage.removeItem(STORAGE_PREFIX+k); }catch(e){}
+  });
+  location.reload();
+}
+
+function demoRenderBanner(){
+  var bar = document.createElement("div");
+  bar.className = "demo-bar";
+  bar.innerHTML =
+    '<span class="demo-badge">DEMO</span>' +
+    '<span class="demo-text">表示されているデータはすべて<strong>架空のサンプル</strong>です。' +
+    '入力内容はこの端末のブラウザ内にのみ保存され、サーバーには送信されません。</span>' +
+    '<span class="demo-actions">' +
+      '<button type="button" class="demo-btn" id="demoResetBtn">初期状態に戻す</button>' +
+      '<a class="demo-btn" href="../../">一覧に戻る</a>' +
+    '</span>';
+  document.body.insertBefore(bar, document.body.firstChild);
+  document.getElementById("demoResetBtn").addEventListener("click", demoReset);
+}
+
 /* ---------- 起動 ---------- */
+if(!storageGet(DEMO_SEED_FLAG)) demoSeedData();
 loadAll();
 renderShell();
+demoRenderBanner();
 
 })();
 </script>

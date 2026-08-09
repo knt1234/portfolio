@@ -1,0 +1,115 @@
+/* ============================================================
+   デモ共通バー
+   ------------------------------------------------------------
+   ポートフォリオ用デモの各アプリの最上部に出す帯。
+   アプリ側のCSS変数に依存せず、単体で明暗どちらでも成立するよう
+   色を自前で持たせている（アプリごとに配色体系が違うため）。
+   ============================================================ */
+
+.demo-bar {
+  --db-bg: #fdf6e3;
+  --db-fg: #4a3a12;
+  --db-line: #e8d9ae;
+  --db-badge-bg: #b4801a;
+  --db-badge-fg: #ffffff;
+  --db-btn-bg: #ffffff;
+  --db-btn-line: #d9c58e;
+
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 9px 16px;
+  background: var(--db-bg);
+  color: var(--db-fg);
+  border-bottom: 1px solid var(--db-line);
+  font: 500 13px/1.5 system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .demo-bar {
+    --db-bg: #2b2416;
+    --db-fg: #f0e2bd;
+    --db-line: #4a3d22;
+    --db-badge-bg: #d3a13a;
+    --db-badge-fg: #241d0c;
+    --db-btn-bg: #3a3120;
+    --db-btn-line: #574728;
+  }
+}
+
+:root[data-theme="dark"] .demo-bar {
+  --db-bg: #2b2416;
+  --db-fg: #f0e2bd;
+  --db-line: #4a3d22;
+  --db-badge-bg: #d3a13a;
+  --db-badge-fg: #241d0c;
+  --db-btn-bg: #3a3120;
+  --db-btn-line: #574728;
+}
+
+.demo-bar .demo-badge {
+  flex: none;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--db-badge-bg);
+  color: var(--db-badge-fg);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.demo-bar .demo-text {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.demo-bar .demo-text strong {
+  font-weight: 700;
+}
+
+.demo-bar .demo-actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.demo-bar .demo-btn {
+  appearance: none;
+  display: inline-block;
+  padding: 5px 12px;
+  border: 1px solid var(--db-btn-line);
+  border-radius: 8px;
+  background: var(--db-btn-bg);
+  color: var(--db-fg);
+  font: inherit;
+  font-size: 12px;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 200ms ease;
+}
+
+.demo-bar .demo-btn:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .10);
+}
+
+.demo-bar .demo-btn:active {
+  transform: scale(.97);
+}
+
+@media (max-width: 560px) {
+  .demo-bar {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
+@media print {
+  .demo-bar { display: none !important; }
+}
