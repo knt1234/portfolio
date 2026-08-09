@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>つくったもの — 業務アプリのポートフォリオ</title>
+<meta name="description" content="自分の業務課題を解決するために作ったWebアプリとダッシュボードのデモ集。請求書作成・領収書発行・イベント収支管理・クレジットカード支出ダッシュボード。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧰</text></svg>">
+<style>
+/* ============================================================
+   配色
+   ------------------------------------------------------------
+   ライト／ダークの両方で成立させる。閲覧者のOS設定に従う。
+   ============================================================ */
+:root {
+  color-scheme: light dark;
+
+  --page:      #f7f7f4;
+  --surface:   #ffffff;
+  --surface-2: #fbfbf9;
+  --ink:       #16181c;
+  --ink-2:     #4c5158;
+  --ink-3:     #83888f;
+  --line:      rgba(20, 22, 26, .10);
+  --line-2:    rgba(20, 22, 26, .06);
+  --accent:    #1f6feb;
+  --accent-ink:#ffffff;
+  --shadow-sm: 0 1px 2px rgba(16, 18, 22, .05);
+  --shadow-md: 0 1px 2px rgba(16, 18, 22, .05), 0 10px 28px rgba(16, 18, 22, .07);
+  --shadow-lg: 0 2px 4px rgba(16, 18, 22, .06), 0 18px 44px rgba(16, 18, 22, .11);
+
+  --ease-out:    cubic-bezier(.16, 1, .3, 1);
+  --ease-spring: cubic-bezier(.32, .72, 0, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page:      #0e0f11;
+    --surface:   #17191d;
+    --surface-2: #1c1f23;
+    --ink:       #f2f3f5;
+    --ink-2:     #b6bbc2;
+    --ink-3:     #838a93;
+    --line:      rgba(255, 255, 255, .11);
+    --line-2:    rgba(255, 255, 255, .06);
+    --accent:    #6ea8ff;
+    --accent-ink:#0e0f11;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
+    --shadow-md: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 28px rgba(0, 0, 0, .35);
+    --shadow-lg: 0 2px 4px rgba(0, 0, 0, .45), 0 18px 44px rgba(0, 0, 0, .45);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font: 100%/1.7 system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  font-size: 16px;
+  letter-spacing: .01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: clamp(2.5rem, 7vw, 5.5rem) clamp(1.25rem, 4vw, 2.5rem) 5rem;
+}
+
+/* ---------- ヘッダー ---------- */
+.masthead { margin-bottom: clamp(2.5rem, 6vw, 4rem); }
+
+.eyebrow {
+  display: inline-block;
+  margin: 0 0 1rem;
+  padding: .3rem .75rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  color: var(--ink-2);
+}
+
+h1 {
+  margin: 0 0 .75rem;
+  font-size: clamp(2rem, 5.5vw, 3.25rem);
+  font-weight: 700;
+  /* 大きい文字ほど字間は詰める */
+  letter-spacing: -.025em;
+  line-height: 1.1;
+}
+
+.lede {
+  margin: 0;
+  max-width: 46ch;
+  font-size: clamp(1rem, 2.2vw, 1.125rem);
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+
+/* ---------- カードのグリッド ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.4rem, 3vw, 1.9rem);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  transition:
+    transform 380ms var(--ease-spring),
+    box-shadow 380ms var(--ease-spring),
+    border-color 380ms var(--ease-out);
+}
+
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(31, 111, 235, .28);
+  }
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  margin-bottom: 1rem;
+}
+
+.icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 1px solid var(--line-2);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--accent);
+}
+.icon svg { width: 1.3rem; height: 1.3rem; }
+
+h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 650;
+  letter-spacing: -.01em;
+  line-height: 1.35;
+}
+
+.card-sub {
+  margin: .15rem 0 0;
+  font-size: .8rem;
+  color: var(--ink-3);
+  letter-spacing: .02em;
+}
+
+/* 課題 → つくったもの */
+.story { margin: 0 0 1.25rem; }
+
+.story dt {
+  margin-bottom: .2rem;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: var(--ink-3);
+}
+.story dd {
+  margin: 0 0 .9rem;
+  font-size: .9rem;
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+.story dd:last-child { margin-bottom: 0; }
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin: 0 0 1.35rem;
+  padding: 0;
+  list-style: none;
+}
+.tags li {
+  padding: .22rem .6rem;
+  border: 1px solid var(--line-2);
+  border-radius: 7px;
+  background: var(--surface-2);
+  font-size: .72rem;
+  letter-spacing: .015em;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.card-foot { margin-top: auto; }
+
+.open {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .6rem 1.1rem;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: .875rem;
+  font-weight: 600;
+  text-decoration: none;
+  /* 押した瞬間に反応させる。離してからでは遅い */
+  transition: transform 110ms var(--ease-out), box-shadow 240ms var(--ease-out), filter 240ms var(--ease-out);
+}
+.open:hover { box-shadow: 0 6px 18px rgba(31, 111, 235, .3); filter: brightness(1.06); }
+.open:active { transform: scale(.97); transition-duration: 70ms; }
+.open svg { width: .8rem; height: .8rem; }
+
+/* ---------- 注記 ---------- */
+.note {
+  margin: clamp(2.5rem, 6vw, 4rem) 0 0;
+  padding: 1.25rem 1.4rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-2);
+  font-size: .85rem;
+  line-height: 1.8;
+  color: var(--ink-2);
+}
+.note h3 {
+  margin: 0 0 .5rem;
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  color: var(--ink);
+}
+.note ul { margin: 0; padding-left: 1.15rem; }
+.note li { margin-bottom: .25rem; }
+.note li:last-child { margin-bottom: 0; }
+
+footer {
+  margin-top: 2.5rem;
+  font-size: .8rem;
+  color: var(--ink-3);
+}
+footer a { color: inherit; }
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .open { transition-duration: 1ms !important; }
+  .card:hover, .open:active { transform: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <!-- ▼ お名前・肩書きはここを書き換えてください -->
+    <span class="eyebrow">PORTFOLIO</span>
+    <h1>自分の業務を、自分で作って軽くする。</h1>
+    <p class="lede">
+      毎月くり返していた手作業を、その都度Webアプリにしてきました。
+      ここに置いてあるのは、実際に業務で使っているものを、
+      架空のデータに入れ替えた<strong>デモ版</strong>です。ログイン不要で、そのまま触れます。
+    </p>
+  </header>
+
+  <main class="grid">
+
+    <!-- ============ 請求書 ============ -->
+    <article class="card">
+      <div class="card-head">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/>
+          </svg>
+        </span>
+        <div>
+          <h2>請求書作成</h2>
+          <p class="card-sub">Invoice Studio</p>
+        </div>
+      </div>
+
+      <dl class="story">
+        <dt>課題</dt>
+        <dd>毎月、前月の請求書ファイルを複製して日付と金額を書き換えていた。源泉徴収税の計算を手でやるため、たまに間違える。</dd>
+        <dt>つくったもの</dt>
+        <dd>取引先を登録しておけば、選んで品目を入れるだけで請求書ができる。源泉徴収税・複数税率・インボイス経過措置の控除まで自動計算し、そのままPDFに書き出す。発行履歴から入金済み／未入金も追える。</dd>
+      </dl>
+
+      <ul class="tags">
+        <li>HTML / CSS / JavaScript</li><li>jsPDF</li><li>localStorage</li><li>ビルド不要</li>
+      </ul>
+
+      <div class="card-foot">
+        <a class="open" href="apps/invoice/">デモを開く
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <!-- ============ 領収書 ============ -->
+    <article class="card">
+      <div class="card-head">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 2v20l2.5-1.5L9 22l2.5-1.5L14 22l2.5-1.5L19 22V2l-2.5 1.5L14 2l-2.5 1.5L9 2 6.5 3.5z"/>
+            <path d="M8 8h8"/><path d="M8 12h8"/>
+          </svg>
+        </span>
+        <div>
+          <h2>領収書発行</h2>
+          <p class="card-sub">Receipt Generator</p>
+        </div>
+      </div>
+
+      <dl class="story">
+        <dt>課題</dt>
+        <dd>入金一覧を見ながら、領収書を1枚ずつ作っていた。月末に数十枚たまると半日仕事になる。</dd>
+        <dt>つくったもの</dt>
+        <dd>入金明細のテキストを貼り付けると、日付・氏名・金額・支払方法を読み取ってまとめて作成。A4に2枚ずつ並べた1つのPDFで出力し、そのまま印刷して切るだけにした。発行会社ごとにインボイス登録番号と但し書きを切り替えられる。</dd>
+      </dl>
+
+      <ul class="tags">
+        <li>HTML / CSS / JavaScript</li><li>html2canvas</li><li>jsPDF</li><li>Firebase Auth（実運用版）</li>
+      </ul>
+
+      <div class="card-foot">
+        <a class="open" href="apps/receipt/">デモを開く
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <!-- ============ イベント収支 ============ -->
+    <article class="card">
+      <div class="card-head">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>
+            <path d="M8 17v-3"/><path d="M12 17v-5"/><path d="M16 17v-2"/>
+          </svg>
+        </span>
+        <div>
+          <h2>イベント収支管理</h2>
+          <p class="card-sub">Event Budget</p>
+        </div>
+      </div>
+
+      <dl class="story">
+        <dt>課題</dt>
+        <dd>合宿の見積もりをスプレッドシートで作っていたが、2人で編集すると数式が壊れ、どれが最新か分からなくなっていた。</dd>
+        <dt>つくったもの</dt>
+        <dd>宿泊・食事・会場などの条件を変えたプランを何案も作り、収支と損益分岐人数を並べて比較。採用した案を予算として固定し、開催後に実績を入れて差額を見る。2人が同時に開いても、入力した内容がすぐ相手の画面に反映される。</dd>
+      </dl>
+
+      <ul class="tags">
+        <li>HTML / CSS / JavaScript</li><li>Firebase Authentication</li><li>Cloud Firestore</li><li>Firebase Hosting</li>
+      </ul>
+
+      <div class="card-foot">
+        <a class="open" href="apps/event-budget/">デモを開く
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+    </article>
+
+    <!-- ============ クレカダッシュボード ============ -->
+    <article class="card">
+      <div class="card-head">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18"/>
+            <rect x="7" y="12" width="3" height="6" rx="1"/>
+            <rect x="12.5" y="8" width="3" height="10" rx="1"/>
+            <rect x="18" y="5" width="3" height="13" rx="1"/>
+          </svg>
+        </span>
+        <div>
+          <h2>クレカ月次支出ダッシュボード</h2>
+          <p class="card-sub">Card Spending Dashboard</p>
+        </div>
+      </div>
+
+      <dl class="story">
+        <dt>課題</dt>
+        <dd>カード4枚の請求メールがバラバラに届くうえ、締め日も支払日も会社ごとに違う。結局ひと月にいくら使っているのか把握できていなかった。</dd>
+        <dt>つくったもの</dt>
+        <dd>請求メールを自動で集計し、「支払月」に基準をそろえて4枚を積み上げグラフで可視化。締め日がずれるカードは支払月に合わせて計上をずらしている。店舗名からのカテゴリ別内訳と、毎月くり返される定額課金の自動検出も付けた。</dd>
+      </dl>
+
+      <ul class="tags">
+        <li>HTML / CSS / JavaScript</li><li>SVG（グラフライブラリ不使用）</li><li>メール自動集計</li>
+      </ul>
+
+      <div class="card-foot">
+        <a class="open" href="apps/card-dashboard/">デモを開く
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+    </article>
+
+  </main>
+
+  <section class="note">
+    <h3>デモについて</h3>
+    <ul>
+      <li>表示される会社名・氏名・金額・取引は<strong>すべて架空</strong>です。実在の個人・企業・取引とは関係ありません。</li>
+      <li>ログインは不要です。入力した内容はサーバーに送られず、ご覧の端末のブラウザ内だけに保存されます。</li>
+      <li>各デモの上部にある「初期状態に戻す」で、いつでも最初のサンプルに戻せます。</li>
+      <li>実運用しているアプリとは別のコピーで、本番の接続情報や実データは含まれていません。</li>
+    </ul>
+  </section>
+
+  <footer>
+    ソースコード： <a href="https://github.com/knt1234/portfolio">github.com/knt1234/portfolio</a>
+  </footer>
+
+</div>
+
+</body>
+</html>

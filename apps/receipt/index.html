@@ -332,11 +332,11 @@
       日付・氏名・金額・「銀振」の有無をタブ区切りのテキストから読み取り、まとめて追加します（現在選択中の会社に追加されます）。<br>
       「銀振」を含む行は「受講料として」、含まない行は「受講料として(クレジット利用)」になります。
     </div>
-    <textarea id="bulkText" placeholder="2026/07/19&#9;&#9;山田太郎 ﾔﾏﾀﾞﾀﾛｳ&#9;NCA&#9;¥550,000&#9;&#9;&#9;&#9;CBS銀振" style="width:100%; min-height:110px; padding:10px; border:1px solid var(--border); border-radius:6px; font-size:13px; font-family:monospace;"></textarea>
+    <textarea id="bulkText" placeholder="2026/07/19&#9;&#9;青木涼子 ｱｵｷﾘｮｳｺ&#9;講座A&#9;¥550,000&#9;&#9;&#9;&#9;ソラミナ銀振" style="width:100%; min-height:110px; padding:10px; border:1px solid var(--border); border-radius:6px; font-size:13px; font-family:monospace;"></textarea>
     <div style="margin-top:10px;">
       <button class="btn-add" id="btnBulkAdd">貼り付けた内容を追加</button>
     </div>
-    <div class="empty-note" id="bulkMetariseNote" style="display:none;">metariseにはこの一括貼り付け機能は使用できません。手入力で追加してください。</div>
+    <div class="empty-note" id="bulkSoraminaNote" style="display:none;">株式会社ソラミナにはこの一括貼り付け機能は使用できません。手入力で追加してください。</div>
   </div>
 
   <!-- Output -->
@@ -364,13 +364,13 @@ const DESC_OPTIONS_DEFAULT = [
   "受講料として(クレジット利用)",
   "受講料として"
 ];
-const DESC_OPTIONS_METARISE = [
+const DESC_OPTIONS_SORAMINA = [
   "研修参加費として"
 ];
 
 // ※ デモ版のため、会社名・登録番号・住所はすべて架空のものに置き換えています。
 const DEFAULT_COMPANIES = [
-  { id: "metarise", name: "株式会社ソラミナ", invoice: "T9000000000011", address: "150-0000\n架空県ナギサ市みなと3-2-1 サンプルビル402" },
+  { id: "soramina", name: "株式会社ソラミナ", invoice: "T9000000000011", address: "150-0000\n架空県ナギサ市みなと3-2-1 サンプルビル402" },
   { id: "cbs", name: "アオイ出版株式会社", invoice: "T9000000000022", address: "150-0000\n架空県ナギサ市みなと3-2-1 サンプルビル402" },
   { id: "soshi", name: "株式会社トキワ学舎", invoice: "T9000000000033", address: "150-0000\n架空県ナギサ市みなと3-2-1 サンプルビル402" },
   { id: "mirai", name: "ハルカゼ推進株式会社", invoice: "", address: "160-0000\n架空県ミドリ市春風5-3-2 ハルカゼビル7F" }
@@ -458,7 +458,7 @@ function bindCompanyEditEvents() {
 function renderDescOptions() {
   const sel = document.getElementById("fDesc");
   sel.innerHTML = "";
-  const options = activeCompanyId === "metarise" ? DESC_OPTIONS_METARISE : DESC_OPTIONS_DEFAULT;
+  const options = activeCompanyId === "soramina" ? DESC_OPTIONS_SORAMINA : DESC_OPTIONS_DEFAULT;
   options.forEach(opt => {
     const o = document.createElement("option");
     o.value = opt;
@@ -500,8 +500,8 @@ function parseBulkText(text) {
 }
 
 function addBulkEntries() {
-  if (activeCompanyId === "metarise") {
-    alert("metariseにはこの一括貼り付け機能は使用できません。");
+  if (activeCompanyId === "soramina") {
+    alert("株式会社ソラミナにはこの一括貼り付け機能は使用できません。");
     return;
   }
   const text = document.getElementById("bulkText").value;
@@ -711,10 +711,10 @@ async function downloadAllPDF() {
 
 // ---------- Init ----------
 function renderBulkPanel() {
-  const isMetarise = activeCompanyId === "metarise";
-  document.getElementById("bulkText").style.display = isMetarise ? "none" : "block";
-  document.getElementById("btnBulkAdd").style.display = isMetarise ? "none" : "inline-block";
-  document.getElementById("bulkMetariseNote").style.display = isMetarise ? "block" : "none";
+  const isSoramina = activeCompanyId === "soramina";
+  document.getElementById("bulkText").style.display = isSoramina ? "none" : "block";
+  document.getElementById("btnBulkAdd").style.display = isSoramina ? "none" : "inline-block";
+  document.getElementById("bulkSoraminaNote").style.display = isSoramina ? "block" : "none";
 }
 
 function renderAll() {
@@ -766,7 +766,7 @@ function demoSeedIfEmpty() {
       { id: "d4", companyId: "soshi", date: "2026-07-11", name: "長谷川 慎一", amount: 264000, desc: "受講料として(クレジット利用)" },
       { id: "d5", companyId: "soshi", date: "2026-07-22", name: "森本 佳奈", amount: 330000, desc: "受講料として" },
       { id: "d6", companyId: "mirai", date: "2026-07-18", name: "岡田 隆之", amount: 121000, desc: "受講料として" },
-      { id: "d7", companyId: "metarise", date: "2026-07-25", name: "白石 遥",  amount: 88000, desc: "研修参加費として" }
+      { id: "d7", companyId: "soramina", date: "2026-07-25", name: "白石 遥",  amount: 88000, desc: "研修参加費として" }
     ]
   };
   saveState();
