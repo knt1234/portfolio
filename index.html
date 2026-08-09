@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>つくったもの｜毎月の手作業をアプリにしました</title>
-<meta name="description" content="請求書づくり、領収書の発行、イベントの収支管理、クレジットカードの支出把握。毎月くり返していた手作業を、自分でアプリにしてきました。ログイン不要で試せるデモを公開しています。">
+<title>つくったもの｜毎月の事務作業を置き換えた業務アプリ</title>
+<meta name="description" content="請求書の作成、領収書の発行、イベントの収支管理、クレジットカードの支出把握。毎月くり返していた事務作業を、自作のアプリに置き換えました。ログイン不要で操作できるデモを公開しています。">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧰</text></svg>">
 <style>
 /* ============================================================
@@ -267,7 +267,7 @@ h2 {
   letter-spacing: .005em;
 }
 
-/* 困っていたこと → 解決したこと */
+/* 課題 → 解決策 */
 .story { margin: 0 0 1.4rem; }
 
 .story dt {
@@ -448,13 +448,13 @@ footer a:hover { color: var(--accent); }
 
   <header class="masthead rise">
     <span class="eyebrow"><span class="dot" aria-hidden="true"></span>つくったもの</span>
-    <h1>毎月くり返していた手作業を、<br>ひとつずつアプリにしました。</h1>
+    <h1>毎月くり返していた事務作業を、<br>自作のアプリに置き換えました。</h1>
     <p class="lede">
-      請求書づくり、領収書の発行、イベントのお金の管理、クレジットカードの支出把握。
-      どれも「面倒だな」と思いながら毎月やっていたことです。
-      ここに置いてあるのは、実際に業務で使っているものを、
+      請求書の作成、領収書の発行、イベントの収支管理、クレジットカードの支出把握。
+      いずれも毎月発生し、そのたびに時間を取られていた業務です。
+      ここに掲載しているのは、実際の業務で使っているものを、
       中身だけ<strong>架空のデータに入れ替えたデモ版</strong>です。
-      登録もログインも不要で、開いてすぐ試せます。
+      登録もログインも不要で、開いてすぐ操作できます。
     </p>
   </header>
 
@@ -470,16 +470,16 @@ footer a:hover { color: var(--accent); }
           </svg>
         </span>
         <div>
-          <h2>請求書づくり</h2>
-          <p class="card-kicker">毎月の請求を、選ぶだけに</p>
+          <h2>請求書の作成</h2>
+          <p class="card-kicker">毎月の作成を、選択と入力だけに</p>
         </div>
       </div>
 
       <dl class="story">
-        <dt>困っていたこと</dt>
-        <dd>毎月、前の月の請求書ファイルをコピーして、日付と金額を書き換えていました。税金の差し引きを電卓で計算するので、たまに間違えます。</dd>
-        <dt>解決したこと</dt>
-        <dd>取引先を一度登録しておけば、あとは<strong>選んで金額を入れるだけ</strong>。消費税と源泉徴収の差し引きまで自動で計算し、そのままPDFとして書き出します。発行した請求書は一覧に残るので、入金が済んだかどうかも後から確認できます。</dd>
+        <dt>課題</dt>
+        <dd>毎月、前月の請求書ファイルを複製し、日付と金額を書き換えていました。源泉徴収の計算を電卓で行っていたため、記載ミスも起きていました。</dd>
+        <dt>解決策</dt>
+        <dd>取引先を一度登録しておけば、あとは<strong>取引先を選び、金額を入力するだけ</strong>です。消費税と源泉徴収の差し引きまで自動で計算し、そのままPDFとして書き出します。発行した請求書は一覧に残るため、入金の有無も後から確認できます。</dd>
       </dl>
 
       <ul class="tags">
@@ -487,7 +487,7 @@ footer a:hover { color: var(--accent); }
       </ul>
 
       <details class="tech">
-        <summary>使っている技術</summary>
+        <summary>使用技術</summary>
         <p>HTML / CSS / JavaScript のみ。PDF生成に jsPDF、保存はブラウザの localStorage。ビルド工程なしの静的ファイル1枚で完結。</p>
       </details>
 
@@ -509,15 +509,15 @@ footer a:hover { color: var(--accent); }
         </span>
         <div>
           <h2>領収書の発行</h2>
-          <p class="card-kicker">数十枚を、貼り付けて一度に</p>
+          <p class="card-kicker">数十枚を貼り付け一括で作成</p>
         </div>
       </div>
 
       <dl class="story">
-        <dt>困っていたこと</dt>
-        <dd>入金の一覧を見ながら、領収書を1枚ずつ作っていました。月末に数十枚たまると、それだけで半日つぶれます。</dd>
-        <dt>解決したこと</dt>
-        <dd>入金の一覧をコピーして<strong>貼り付けるだけで、必要な枚数をまとめて作ります</strong>。A4の紙に2枚ずつ並んだ形で出てくるので、印刷して切るだけ。会社名や但し書きは、発行元ごとに切り替えられます。</dd>
+        <dt>課題</dt>
+        <dd>入金一覧を見ながら、領収書を1枚ずつ作成していました。月末に数十枚たまると、それだけで半日近く取られます。</dd>
+        <dt>解決策</dt>
+        <dd>入金一覧をコピーして<strong>貼り付けるだけで、必要な枚数をまとめて作成します</strong>。A4用紙に2枚ずつ配置した形で出力されるため、印刷して切り分けるだけで済みます。社名や但し書きは、発行元ごとに切り替えられます。</dd>
       </dl>
 
       <ul class="tags">
@@ -525,8 +525,8 @@ footer a:hover { color: var(--accent); }
       </ul>
 
       <details class="tech">
-        <summary>使っている技術</summary>
-        <p>HTML / CSS / JavaScript。画面を html2canvas で画像化し jsPDF で1つのPDFに結合。実際に使っている版は Firebase Authentication で利用者を限定。</p>
+        <summary>使用技術</summary>
+        <p>HTML / CSS / JavaScript。画面を html2canvas で画像化し jsPDF で1つのPDFに結合。実際に稼働している版は Firebase Authentication で利用者を限定。</p>
       </details>
 
       <div class="card-foot">
@@ -547,16 +547,16 @@ footer a:hover { color: var(--accent); }
           </svg>
         </span>
         <div>
-          <h2>イベントのお金の管理</h2>
-          <p class="card-kicker">黒字になる案を、見比べて決める</p>
+          <h2>イベントの収支管理</h2>
+          <p class="card-kicker">複数案の比較から実績確認まで</p>
         </div>
       </div>
 
       <dl class="story">
-        <dt>困っていたこと</dt>
-        <dd>合宿の見積もりを表計算ソフトで作っていましたが、2人で同時に触ると計算式が壊れ、どれが最新か分からなくなっていました。</dd>
-        <dt>解決したこと</dt>
-        <dd>宿の部屋数や食事の回数を変えた案を何通りか作り、<strong>「どの案なら黒字か」「何人集まれば元が取れるか」を並べて見比べられます</strong>。案をひとつ決めたら予算として固定し、終わったあとに実際かかった額を入れて差を確認。2人が同時に開いても、片方の入力がすぐもう片方の画面に出ます。</dd>
+        <dt>課題</dt>
+        <dd>合宿の見積もりを表計算ソフトで作成していましたが、2人で同時に編集すると計算式が壊れ、どれが最新版か分からなくなっていました。</dd>
+        <dt>解決策</dt>
+        <dd>宿泊の部屋数や食事の回数を変えた案を複数作成し、<strong>どの案が黒字になるか、何人集まれば採算が合うかを並べて比較できます</strong>。採用する案を決めたら予算として確定し、開催後に実績を入力して差額を確認します。2人が同時に開いても、一方の入力がもう一方の画面にすぐ反映されます。</dd>
       </dl>
 
       <ul class="tags">
@@ -564,7 +564,7 @@ footer a:hover { color: var(--accent); }
       </ul>
 
       <details class="tech">
-        <summary>使っている技術</summary>
+        <summary>使用技術</summary>
         <p>Firebase Authentication（Googleログイン）＋ Cloud Firestore ＋ Firebase Hosting。onSnapshot による購読でリアルタイム同期。アプリ本体は約3,000行。</p>
       </details>
 
@@ -587,24 +587,24 @@ footer a:hover { color: var(--accent); }
           </svg>
         </span>
         <div>
-          <h2>カードの支出をひと目で</h2>
-          <p class="card-kicker">4枚をまとめて、月ごとに</p>
+          <h2>クレジットカードの支出管理</h2>
+          <p class="card-kicker">4枚分を支払月ベースで集計</p>
         </div>
       </div>
 
       <dl class="story">
-        <dt>困っていたこと</dt>
-        <dd>カード4枚の請求メールがバラバラに届くうえ、締め日も引き落とし日も会社ごとに違います。結局ひと月にいくら使っているのか、分からないままでした。</dd>
-        <dt>解決したこと</dt>
-        <dd>届いた請求メールを自動で読み取って集計し、<strong>「実際に引き落とされた月」にそろえてグラフにしました</strong>。締め日がずれるカードも、引き落としの月に合わせて数えています。何にいくら使ったかの内訳と、毎月自動で引き落とされている定額サービスの洗い出しも出ます。</dd>
+        <dt>課題</dt>
+        <dd>カード4枚の請求メールが個別に届くうえ、締め日も引き落とし日もカード会社ごとに異なります。結果として、月にいくら使っているのかを把握できていませんでした。</dd>
+        <dt>解決策</dt>
+        <dd>受信した請求メールを自動で読み取って集計し、<strong>実際に引き落とされた月を基準にそろえてグラフ化しました</strong>。締め日がずれるカードも、引き落とし月に合わせて計上しています。用途別の内訳と、毎月定額で引き落とされているサービスの抽出も行います。</dd>
       </dl>
 
       <ul class="tags">
-        <li>メールから自動集計</li><li>グラフで推移を比較</li><li>使い道の内訳</li><li>定額サービスの検出</li>
+        <li>メールから自動集計</li><li>グラフで推移を比較</li><li>用途別の内訳</li><li>定額サービスの検出</li>
       </ul>
 
       <details class="tech">
-        <summary>使っている技術</summary>
+        <summary>使用技術</summary>
         <p>グラフ描画ライブラリを使わず、素の SVG を JavaScript で組み立て。メールからの抽出・集計は別途スクリプトで実行し、結果をこの画面に流し込む構成。</p>
       </details>
 
@@ -620,15 +620,15 @@ footer a:hover { color: var(--accent); }
   <section class="note">
     <h3>デモ版について</h3>
     <ul>
-      <li>出てくる会社名・人の名前・金額は<strong>すべて架空</strong>です。実在の人や会社、実際の取引とは関係ありません。</li>
-      <li>ログインは要りません。入力した内容がどこかに送られることはなく、<strong>ご覧の端末の中だけ</strong>に残ります。</li>
-      <li>画面上部の「初期状態に戻す」を押せば、いつでも最初のサンプルに戻ります。遠慮なく操作してください。</li>
-      <li>業務で実際に使っているものとは別のコピーです。本物のデータは一切入っていません。</li>
+      <li>掲載している社名・氏名・金額は<strong>すべて架空</strong>です。実在の個人・法人および実際の取引とは関係ありません。</li>
+      <li>ログインは不要です。入力した内容は外部に送信されず、<strong>ご覧の端末内にのみ</strong>保存されます。</li>
+      <li>画面上部の「初期状態に戻す」で、いつでもサンプルデータの状態に戻せます。</li>
+      <li>実際に稼働しているものとは別のコピーで、実データは含まれていません。</li>
     </ul>
   </section>
 
   <footer>
-    プログラムの中身はこちらで公開しています：
+    ソースコードはこちらで公開しています：
     <a href="https://github.com/knt1234/portfolio">github.com/knt1234/portfolio</a>
   </footer>
 
