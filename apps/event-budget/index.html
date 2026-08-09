@@ -3,11 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>イベント収支管理</title>
+<title>イベント収支管理（デモ）</title>
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="../../assets/demo-bar.css">
+<style>
+  /* デモ用の追記：
+     「使い方」タブの画面写真は実運用中の画面を撮ったもので、実際の
+     イベント名や金額が写り込んでいるため、デモ版には同梱していません。
+     アプリ側に元から用意されている「画像が無いとき」の表示を使い、
+     その理由をひとこと添えています。 */
+  .help-shot.missing figcaption::after {
+    content: "（デモ版では画面写真を省略しています）";
+    display: block;
+    margin-top: 4px;
+    opacity: .7;
+  }
+</style>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
 </head>
 <body>
+
+<!-- ========== デモ用の帯（実運用版にはありません） ========== -->
+<div class="demo-bar">
+  <span class="demo-badge">DEMO</span>
+  <span class="demo-text">イベント名・宿泊先・金額・利用者はすべて<strong>架空のサンプル</strong>です。
+    実運用版はGoogleログイン＋クラウド保存で2名が同時に編集しますが、デモ版は保存先をブラウザ内に置き換えています。</span>
+  <span class="demo-actions">
+    <button type="button" class="demo-btn" id="demoResetBtn">初期状態に戻す</button>
+    <a class="demo-btn" href="../../">一覧に戻る</a>
+  </span>
+</div>
 
 <!-- ========== 認証ゲート ========== -->
 <div id="gate" class="gate">
@@ -103,5 +128,14 @@
 <div class="toast" id="toast"></div>
 
 <script type="module" src="app.js"></script>
+<script type="module">
+  // デモ用：サンプルデータを入れ直す
+  import { resetDemoData } from "./firebase-mock.js";
+  document.getElementById("demoResetBtn").addEventListener("click", () => {
+    if (!confirm("サンプルデータを入れ直して、最初の状態に戻します。\nこの画面で入力・編集した内容は消えます。よろしいですか？")) return;
+    resetDemoData();
+    location.reload();
+  });
+</script>
 </body>
 </html>

@@ -5,14 +5,21 @@
    ・ビルド不要。Firebase SDK は CDN から直接読み込む。
    ============================================================ */
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+/* --- デモ版のための差し替え（ここだけが実運用版との違い） ---------------
+   実運用版:
+     import { initializeApp } from ".../firebase-app.js";
+     import { getAuth, ... }   from ".../firebase-auth.js";
+     import { getFirestore, ...} from ".../firebase-firestore.js";
+     import { firebaseConfig } from "./firebase-config.js";
+   デモ版では、この3つの読み込み先を firebase-mock.js に向けている。
+   以降のコードは実運用版と1行も変わらない。
+   -------------------------------------------------------------------- */
 import {
-  getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-import {
+  initializeApp,
+  getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
   getFirestore, collection, doc, getDoc, setDoc, deleteDoc, onSnapshot
-} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js";
+} from "./firebase-mock.js";
+const firebaseConfig = { apiKey: "demo-no-network" };
 
 /* ---------- Firestore 上の置き場所 ----------
    events/{eventId}        … イベント1件＝ドキュメント1件（プラン・予算・実績を含む）
