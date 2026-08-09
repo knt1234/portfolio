@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>クレジットカード月次支出ダッシュボード（デモ）</title>
+<link rel="stylesheet" href="../../assets/demo-bar.css">
+<style>
+body { margin:0; background:#f9f9f7; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body { background:#0d0d0d; }
+}
+.viz-root {
+  color-scheme: light;
+  --surface-1:      #fcfcfb;
+  --page:           #f9f9f7;
+  --text-primary:   #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted:     #898781;
+  --grid:           #e1e0d9;
+  --baseline:       #c3c2b7;
+  --border:         rgba(11,11,11,0.10);
+  --series-rakuten: #2a78d6; /* blue */
+  --series-saison:  #008300; /* green */
+  --series-smbc:    #eda100; /* yellow */
+  --series-paypay:  #4a3aa7; /* violet */
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--text-primary);
+  background: var(--page);
+  padding: 24px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) .viz-root {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --page: #0d0d0d;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --grid: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255,255,255,0.10);
+    --series-rakuten: #3987e5;
+    --series-saison: #008300;
+    --series-smbc: #c98500;
+    --series-paypay: #9085e9;
+  }
+}
+:root[data-theme="dark"] .viz-root {
+  color-scheme: dark;
+  --surface-1: #1a1a19;
+  --page: #0d0d0d;
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted: #898781;
+  --grid: #2c2c2a;
+  --baseline: #383835;
+  --border: rgba(255,255,255,0.10);
+  --series-rakuten: #3987e5;
+  --series-saison: #008300;
+  --series-smbc: #c98500;
+  --series-paypay: #9085e9;
+}
+.viz-root {
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+.viz-root * { box-sizing: border-box; }
+h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  margin: 0 0 6px;
+}
+.sub { color: var(--text-secondary); font-size: 13px; line-height: 1.5; letter-spacing: 0.005em; margin: 0 0 24px; max-width: 62ch; }
+
+.card {
+  background: color-mix(in srgb, var(--surface-1) 92%, transparent);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--border);
+  border-top: 1px solid color-mix(in srgb, var(--text-primary) 6%, var(--border));
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(11,11,11,0.04), 0 8px 24px rgba(11,11,11,0.05);
+  overflow-x: auto;
+  position: relative;
+}
+
+.stat-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.stat-tile {
+  background: color-mix(in srgb, var(--surface-1) 92%, transparent);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--border);
+  border-top: 1px solid color-mix(in srgb, var(--text-primary) 6%, var(--border));
+  border-radius: 14px;
+  padding: 16px 18px;
+  flex: 1;
+  min-width: 150px;
+  box-shadow: 0 1px 2px rgba(11,11,11,0.04);
+  transition: transform 320ms var(--ease-spring), box-shadow 320ms var(--ease-spring), border-color 320ms var(--ease-out);
+}
+.stat-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(11,11,11,0.08);
+  border-color: color-mix(in srgb, var(--text-primary) 14%, var(--border));
+}
+.stat-tile .label { font-size: 12px; color: var(--text-muted); letter-spacing: 0.01em; margin-bottom: 6px; }
+.stat-tile .value { font-size: 24px; font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.stat-tile .note { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+.legend { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 16px; font-size: 12px; color: var(--text-secondary); }
+.legend .item { display: flex; align-items: center; gap: 7px; }
+.legend .swatch { width: 9px; height: 9px; border-radius: 3px; }
+
+svg { display: block; overflow: visible; }
+.bar-group { cursor: pointer; }
+.bar-seg {
+  transition: opacity 260ms var(--ease-spring), filter 260ms var(--ease-spring), transform 260ms var(--ease-spring);
+  transform-box: fill-box;
+  transform-origin: bottom center;
+}
+.bar-group:hover .bar-seg { filter: brightness(1.08); transform: scaleX(1.03); }
+.axis-label { font-size: 10px; fill: var(--text-muted); }
+.total-label { font-size: 10px; fill: var(--text-secondary); font-variant-numeric: tabular-nums; font-weight: 600; }
+.gridline { stroke: var(--grid); stroke-width: 1; }
+
+.tooltip {
+  position: absolute;
+  background: color-mix(in srgb, var(--surface-1) 88%, transparent);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12px;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(11,11,11,0.10), 0 12px 32px rgba(11,11,11,0.10);
+  opacity: 0;
+  transform: scale(0.92) translateY(2px);
+  transform-origin: left top;
+  transition: opacity 160ms var(--ease-out), transform 220ms var(--ease-spring);
+  z-index: 10;
+  min-width: 160px;
+}
+.tooltip.visible { opacity: 1; transform: scale(1) translateY(0); }
+.tooltip .t-month { font-weight: 700; letter-spacing: -0.005em; margin-bottom: 6px; }
+.tooltip .t-row { display: flex; justify-content: space-between; gap: 12px; padding: 1px 0; font-variant-numeric: tabular-nums; }
+.tooltip .t-total { border-top: 1px solid var(--border); margin-top: 5px; padding-top: 5px; font-weight: 700; }
+
+.toggle-btn {
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  background: color-mix(in srgb, var(--surface-1) 92%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 7px 14px;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: transform 120ms var(--ease-out), background 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+}
+.toggle-btn:hover { box-shadow: 0 2px 8px rgba(11,11,11,0.08); }
+.toggle-btn:active { transform: scale(0.96); }
+
+.view-swap { transition: opacity 220ms var(--ease-out); }
+.view-swap.fading { opacity: 0; }
+
+table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+th, td { text-align: right; padding: 7px 10px; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; }
+th { color: var(--text-muted); font-weight: 600; letter-spacing: 0.01em; }
+tbody tr { transition: background 160ms var(--ease-out); }
+tbody tr:hover { background: color-mix(in srgb, var(--text-primary) 3%, transparent); }
+
+.foot { font-size: 11px; color: var(--text-muted); line-height: 1.7; letter-spacing: 0.005em; margin-top: 14px; }
+.hidden { display: none; }
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 16px;
+  background: color-mix(in srgb, var(--text-primary) 5%, transparent);
+  border-radius: 12px;
+  width: fit-content;
+}
+.tab-btn {
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  background: transparent;
+  border: none;
+  border-radius: 9px;
+  padding: 8px 16px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 220ms var(--ease-spring), color 220ms var(--ease-out), transform 120ms var(--ease-out);
+}
+.tab-btn:active { transform: scale(0.96); }
+.tab-btn.active {
+  background: var(--surface-1);
+  color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(11,11,11,0.10);
+}
+.tab-panel { transition: opacity 220ms var(--ease-out); }
+.tab-panel.fading { opacity: 0; }
+
+.panel-lead { font-size: 13px; color: var(--text-secondary); margin: 0 0 18px; }
+
+.cat-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.cat-row .cat-name { width: 110px; flex-shrink: 0; font-size: 13px; color: var(--text-primary); }
+.cat-row .cat-track { flex: 1; height: 10px; background: var(--grid); border-radius: 6px; overflow: hidden; }
+.cat-row .cat-fill {
+  height: 100%; border-radius: 6px; background: var(--series-rakuten);
+  transition: width 480ms var(--ease-spring);
+}
+.cat-row .cat-value { width: 90px; flex-shrink: 0; text-align: right; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.merchant-list { margin-top: 20px; }
+.merchant-list h3 { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin: 0 0 10px; letter-spacing: 0.01em; }
+.merchant-item {
+  display: flex; justify-content: space-between; padding: 8px 0;
+  border-bottom: 1px solid var(--grid); font-size: 13px;
+  transition: background 160ms var(--ease-out);
+}
+.merchant-item:hover { background: color-mix(in srgb, var(--text-primary) 3%, transparent); }
+.merchant-item .m-name { color: var(--text-primary); }
+.merchant-item .m-value { font-variant-numeric: tabular-nums; color: var(--text-secondary); font-weight: 600; }
+
+.subs-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  transition: transform 260ms var(--ease-spring), box-shadow 260ms var(--ease-spring);
+}
+.subs-card:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(11,11,11,0.06); }
+.subs-card .s-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; gap: 10px; }
+.subs-card .s-name { font-size: 14px; font-weight: 700; letter-spacing: -0.005em; }
+.subs-card .s-badge {
+  font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+  background: color-mix(in srgb, var(--text-primary) 7%, transparent); color: var(--text-secondary);
+  white-space: nowrap;
+}
+.subs-card .s-latest { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.subs-card .s-meta { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+.s-history { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--grid); }
+.s-hist-row { display: flex; align-items: center; gap: 10px; padding: 3px 0; }
+.s-hist-month { width: 76px; flex-shrink: 0; font-size: 11px; color: var(--text-muted); }
+.s-hist-track { flex: 1; height: 6px; background: var(--grid); border-radius: 4px; overflow: hidden; }
+.s-hist-fill { height: 100%; border-radius: 4px; background: var(--text-muted); opacity: 0.55; }
+.s-hist-value { width: 70px; flex-shrink: 0; text-align: right; font-size: 11px; font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+
+@media (prefers-reduced-motion: reduce) {
+  .stat-tile, .bar-seg, .tooltip, .toggle-btn, .view-swap, tbody tr,
+  .tab-btn, .tab-panel, .cat-fill, .merchant-item, .subs-card {
+    transition-duration: 1ms !important;
+  }
+  .stat-tile:hover, .tab-btn:active, .toggle-btn:active, .subs-card:hover { transform: none; }
+  .bar-group:hover .bar-seg { transform: none; }
+  .tooltip { transform: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="demo-bar">
+  <span class="demo-badge">DEMO</span>
+  <span class="demo-text">グラフに出ている金額・店舗名・契約はすべて<strong>架空のサンプル</strong>です。カード会社名のみ実在の名称を使っていますが、実際の利用実績とは一切関係ありません。</span>
+  <span class="demo-actions">
+    <a class="demo-btn" href="../../">一覧に戻る</a>
+  </span>
+</div>
+
+<div class="viz-root">
+  <h1>クレジットカード月次支出ダッシュボード</h1>
+  <p class="sub">楽天カード・セゾンカード・三井住友カード・PayPayカードの請求メールから、支払月ベースで集計（メール自動集計・2026年8月1日時点）</p>
+
+  <div class="stat-row" id="statRow"></div>
+
+  <div class="tabs" id="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="trend" role="tab" aria-selected="true">月次推移</button>
+    <button class="tab-btn" data-tab="category" role="tab" aria-selected="false">カテゴリ別</button>
+    <button class="tab-btn" data-tab="subs" role="tab" aria-selected="false">定額・サブスク</button>
+  </div>
+
+  <div id="panel-trend" class="tab-panel">
+    <div class="card">
+      <div class="legend" id="legend"></div>
+      <div id="chartWrap" class="view-swap" style="overflow-x:auto;">
+        <svg id="chart" width="900" height="360"></svg>
+      </div>
+      <div style="margin-top:14px;">
+        <button class="toggle-btn" id="toggleBtn">表で見る</button>
+      </div>
+      <div id="tableWrap" class="view-swap hidden"></div>
+      <div class="foot">
+        ※ すべて「支払月」基準で集計（各社とも請求メールに記載の支払日が属する月）。<br>
+        ※ 三井住友カードは月次請求メールに金額が記載されないため、都度の利用通知を「月末締め」で合算し、支払日（翌月26日）の月にずらして計上（例: 2025年5月のご利用分→2025年6月26日払い扱い）。2025年5月ご利用分（＝2025年6月支払分）から集計。<br>
+        ※ 2026年8月支払分は、三井住友カード・セゾンカードのみ確定済み。楽天カード・PayPayカードは請求メールが未着（支払日が月末近くのため）のため「—」表記とし、確定次第、次回更新（9月）で反映します。<br>
+        ※ <span id="smbcPending"></span>
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-category" class="tab-panel hidden">
+    <div class="card">
+      <p class="panel-lead">三井住友カードの都度利用通知から、店舗名でカテゴリ分けした内訳です。</p>
+      <div id="categoryBars"></div>
+      <div id="merchantList"></div>
+      <div class="foot">
+        ※ 店舗名が判明する三井住友カードの通知のみが対象（2025年12月ご利用分〜2026年7月ご利用分）。楽天・セゾン・PayPayは店舗名の網羅的な取得を行っていないため未集計です。<br>
+        ※ カテゴリ分けは店舗名からの簡易的な自動判定です。
+      </div>
+    </div>
+  </div>
+
+  <div id="panel-subs" class="tab-panel hidden">
+    <div class="card">
+      <p class="panel-lead">楽天カードの利用明細から、毎月ほぼ同じ店舗名で繰り返し請求されている項目を検出しました。</p>
+      <div id="subsTable"></div>
+      <div class="foot">
+        ※ メールで確認できた範囲の金額のみを集計（欠けている月あり）。通信料・電気料金は使用量に応じて金額が変動する実費精算型、ケーブルネット・AIサービスはほぼ固定額の定額課金です。<br>
+        ※ 三井住友・セゾン・PayPayについては、同様の網羅的な明細取得を行っていないためサブスク検出の対象外です。
+      </div>
+    </div>
+  </div>
+
+  <div class="tooltip" id="tooltip"></div>
+</div>
+
+<script>
+(function(){
+  /* ============================================================
+     ここに入っている数字・店舗名・契約名は、すべて架空のサンプルです。
+     実運用版はメールから自動で集計した実データを読み込みますが、
+     デモ版では公開のため、同じ構造の架空データに差し替えています。
+     ============================================================ */
+  const months = ["2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04","2026-05","2026-06","2026-07","2026-08"];
+  const rakuten = [143200,88650,176400,121980,105330,98420,187650,231480,199720,168340,152900,134560,118270,74390,null];
+  const saison  = [480,480,480,480,480,480,5940,480,0,0,0,0,0,480,0];
+  // 三井住友カードは「月末締め・翌月26日払い」。例: 2026年2月ご利用分(2/1-2/28) → 2026年3月26日払い。
+  // このため他3社と同じ「支払月」基準に揃えるには、利用月の集計値を1か月後ろにずらして計上する。
+  const smbc    = [12400,14830,11250,13670,10980,12310,15420,9870,13540,22160,28470,31220,33890,36150,41280];
+  const paypay  = [0,2200,9800,0,0,5400,0,0,0,0,0,3960,0,0,null];
+  const smbcPendingNote = "参考: 2026年9月26日払い分（8月ご利用・8/1時点の集計）は¥0（次回更新で反映）";
+
+  const series = [
+    { key: "rakuten", name: "楽天カード", color: "var(--series-rakuten)", data: rakuten },
+    { key: "saison",  name: "セゾンカード", color: "var(--series-saison)", data: saison },
+    { key: "smbc",    name: "三井住友カード", color: "var(--series-smbc)", data: smbc },
+    { key: "paypay",  name: "PayPayカード", color: "var(--series-paypay)", data: paypay },
+  ];
+
+  const totals = months.map((_, i) => series.reduce((s, se) => s + (se.data[i] || 0), 0));
+
+  // ---- 上部の数字（4社すべてが確定している直近月を基準にする） ----
+  let lastIdx = months.length - 1;
+  while (lastIdx >= 0 && !series.every(se => se.data[lastIdx] != null)) lastIdx--;
+  const prevIdx = lastIdx - 1;
+  const confirmedTotals = totals.slice(0, lastIdx + 1);
+  const avg = Math.round(confirmedTotals.reduce((a,b)=>a+b,0) / confirmedTotals.length);
+  const statRow = document.getElementById("statRow");
+  const stats = [
+    { label: "直近確定月（2026年7月支払）合計", value: totals[lastIdx], note: "" },
+    { label: "前月（2026年6月支払）合計", value: totals[prevIdx], note: "" },
+    { label: "過去14か月平均", value: avg, note: "2025年6月〜2026年7月支払分" },
+  ];
+  stats.forEach(s => {
+    const el = document.createElement("div");
+    el.className = "stat-tile";
+    el.innerHTML = `<div class="label">${s.label}</div><div class="value">¥${s.value.toLocaleString()}</div><div class="note">${s.note}</div>`;
+    statRow.appendChild(el);
+  });
+
+  // ---- 凡例 ----
+  const legend = document.getElementById("legend");
+  series.forEach(se => {
+    const item = document.createElement("div");
+    item.className = "item";
+    item.innerHTML = `<span class="swatch" style="background:${se.color}"></span>${se.name}`;
+    legend.appendChild(item);
+  });
+
+  // ---- グラフ ----
+  const svg = document.getElementById("chart");
+  const W = 900, H = 360;
+  const marginL = 56, marginR = 12, marginT = 24, marginB = 44;
+  const plotW = W - marginL - marginR;
+  const plotH = H - marginT - marginB;
+  const maxTotal = Math.max(...totals);
+  const yMax = Math.ceil(maxTotal / 50000) * 50000;
+  const n = months.length;
+  const gap = 10;
+  const barW = (plotW / n) - gap;
+
+  function y(v) { return marginT + plotH - (v / yMax) * plotH; }
+
+  const ns = "http://www.w3.org/2000/svg";
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  const ticks = 5;
+  for (let i = 0; i <= ticks; i++) {
+    const v = (yMax / ticks) * i;
+    const yy = y(v);
+    svg.appendChild(el("line", { class: "gridline", x1: marginL, x2: W - marginR, y1: yy, y2: yy }));
+    const t = el("text", { class: "axis-label", x: marginL - 8, y: yy + 3, "text-anchor": "end" });
+    t.textContent = "¥" + Math.round(v/10000) + "万";
+    svg.appendChild(t);
+  }
+
+  const tooltip = document.getElementById("tooltip");
+  const chartCard = svg.closest(".card");
+
+  months.forEach((m, i) => {
+    const x0 = marginL + i * (plotW / n) + gap / 2;
+    const group = el("g", { class: "bar-group" });
+    let cursorY = y(0);
+    series.forEach(se => {
+      const v = se.data[i];
+      if (!v) return;
+      const segH = (v / yMax) * plotH;
+      const segY = cursorY - segH;
+      const rect = el("rect", {
+        class: "bar-seg",
+        x: x0, y: segY, width: barW, height: Math.max(segH - 2, 0),
+        fill: se.color, rx: 3,
+      });
+      group.appendChild(rect);
+      cursorY = segY - 2;
+    });
+    const total = totals[i];
+    if (total > 0) {
+      const label = el("text", { class: "total-label", x: x0 + barW/2, y: y(total) - 8, "text-anchor": "middle" });
+      label.textContent = (total/10000).toFixed(1) + "万";
+      group.appendChild(label);
+    }
+    const [yy2, mo] = m.split("-");
+    const lbl = el("text", { class: "axis-label", x: x0 + barW/2, y: H - marginB + 16, "text-anchor": "middle" });
+    lbl.textContent = (mo[0]==="0"?mo[1]:mo) + "月" + (mo === "01" ? " '" + yy2.slice(2) : "");
+    group.appendChild(lbl);
+
+    const hoverRect = el("rect", {
+      x: x0 - gap/2, y: marginT, width: barW + gap, height: plotH,
+      fill: "transparent",
+    });
+    group.appendChild(hoverRect);
+
+    group.addEventListener("mousemove", (ev) => {
+      const rect = chartCard.getBoundingClientRect();
+      tooltip.style.left = (ev.clientX - rect.left + 12) + "px";
+      tooltip.style.top = (ev.clientY - rect.top + 12) + "px";
+      tooltip.classList.add("visible");
+      let rows = series.map(se => {
+        const v = se.data[i];
+        return `<div class="t-row"><span>${se.name}</span><span>${v != null ? "¥"+v.toLocaleString() : "—"}</span></div>`;
+      }).join("");
+      tooltip.innerHTML = `<div class="t-month">${m}</div>${rows}<div class="t-row t-total"><span>合計</span><span>¥${totals[i].toLocaleString()}</span></div>`;
+    });
+    group.addEventListener("mouseleave", () => { tooltip.classList.remove("visible"); });
+
+    svg.appendChild(group);
+  });
+
+  svg.appendChild(el("line", { x1: marginL, x2: W - marginR, y1: y(0), y2: y(0), stroke: "var(--baseline)", "stroke-width": 1 }));
+
+  // ---- 表ビュー ----
+  const tableWrap = document.getElementById("tableWrap");
+  let tableHTML = "<table><thead><tr><th>月</th>";
+  series.forEach(se => tableHTML += `<th>${se.name}</th>`);
+  tableHTML += "<th>合計</th></tr></thead><tbody>";
+  months.forEach((m, i) => {
+    tableHTML += `<tr><td>${m}</td>`;
+    series.forEach(se => {
+      const v = se.data[i];
+      tableHTML += `<td>${v != null ? "¥"+v.toLocaleString() : "—"}</td>`;
+    });
+    tableHTML += `<td><strong>¥${totals[i].toLocaleString()}</strong></td></tr>`;
+  });
+  tableHTML += "</tbody></table>";
+  tableWrap.innerHTML = tableHTML;
+
+  document.getElementById("smbcPending").textContent = smbcPendingNote;
+
+  const toggleBtn = document.getElementById("toggleBtn");
+  const chartWrap = document.getElementById("chartWrap");
+  let showingTable = false;
+  let swapping = false;
+  toggleBtn.addEventListener("click", () => {
+    if (swapping) return;
+    swapping = true;
+    const from = showingTable ? tableWrap : chartWrap;
+    from.classList.add("fading");
+    setTimeout(() => {
+      showingTable = !showingTable;
+      tableWrap.classList.toggle("hidden", !showingTable);
+      chartWrap.classList.toggle("hidden", showingTable);
+      toggleBtn.textContent = showingTable ? "グラフで見る" : "表で見る";
+      const to = showingTable ? tableWrap : chartWrap;
+      to.classList.add("fading");
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          to.classList.remove("fading");
+          from.classList.remove("fading");
+          swapping = false;
+        });
+      });
+    }, 200);
+  });
+
+  // ==== カテゴリ別タブ（三井住友カード都度利用通知、2025年12月〜2026年7月ご利用分）====
+  const smbcTx = {
+    "2025-12": [["デイリーマート",179],["ストアQ",642],["ファミリーグリル",804],["フレッシュ市場",914],["ファミリーグリル",975],["フレッシュ市場",1236],["まる屋",694],["フレッシュ市場",623],["まる屋",731],["デイリーマート",394],["まる屋",516],["定食のとん平",696],["フレッシュ市場",1466]],
+    "2026-01": [["まる屋",874],["バーガーハウス",590],["ストアQ",746],["フレッシュ市場",1191],["フレッシュ市場",1522],["フレッシュ市場",1485],["まる屋",709],["ホームプラス",811],["まる屋",584],["ファミリーグリル",589],["バーガーハウス",413],["ファミリーグリル",1056],["まる屋",577],["ファミリーグリル",465],["スクエア決済",849],["ファミリーグリル",1079]],
+    "2026-02": [["フレッシュ市場",1592],["ホテルアオイ",2222],["デイリーマート",582],["ラーメン十番",985],["まる屋",711],["フレッシュ市場",879],["フレッシュ市場",626],["サンクスストア",599],["まる屋",762],["フレッシュ市場",311],["ファミリーグリル",698],["サンプル加盟店",627],["デイリーマート",350],["ラーメン十番",1250],["ファミリーグリル",866],["カフェ・ノワ",510],["サンプル加盟店",976],["フレッシュ市場",613],["ストアQ",236],["サンクスストア",360],["ファミリーグリル",965],["まる屋",640],["スクエア決済",897],["デイリーマート",293],["カフェ・ノワ",455],["サンプル加盟店",839],["バーガーハウス",748],["サンクスストア",432],["ファミリーグリル",1136]],
+    "2026-03": [["フレッシュ市場",1400],["フレッシュ市場",278],["まる屋",868],["まる屋",592],["カフェ・ノワ",532],["フレッシュ市場",1152],["ファミリーグリル",583],["ファミリーグリル",1083],["フレッシュ市場",1278],["デイリーマート",610],["ストアQ",717],["フレッシュ市場",1285],["定食のとん平",957],["バーガーハウス",477],["ストアQ",578],["ファミリーグリル",1100],["ラーメン十番",1265],["デイリーマート",322],["フレッシュ市場",263],["フレッシュ市場",1238],["バーガーハウス",875],["フレッシュ市場",499],["フレッシュ市場",1009],["バーガーハウス",521],["フレッシュ市場",1424],["デイリーマート",558],["フレッシュ市場",1464],["スクエア決済",1382],["みなと空港ターミナル",1132],["フレッシュ市場",940],["バーガーハウス",838],["ファミリーグリル",648],["フレッシュ市場",204],["フレッシュ市場",398]],
+    "2026-04": [["バーガーハウス",419],["サンクスストア",583],["バーガーハウス",545],["サンプル加盟店",1053],["フレッシュ市場",1501],["ファミリーグリル",551],["デイリーマート",433],["定食のとん平",832],["フレッシュ市場",762],["フレッシュ市場",1041],["フレッシュ市場",886],["デイリーマート",177],["バーガーハウス",836],["サンプル加盟店",790],["ファミリーグリル",978],["ファミリーグリル",1013],["サンクスストア",511],["ラーメン十番",1019],["フレッシュ市場",1072],["フレッシュ市場",285],["ストアQ",726],["まる屋",622],["ストアQ",440],["デイリーマート",775],["まる屋",760],["ファミリーグリル",1126],["バーガーハウス",758],["バーガーハウス",901],["まる屋",719],["フレッシュ市場",1585],["ホテルアオイ",1110],["フレッシュ市場",588],["デイリーマート",161],["フレッシュ市場",1584],["スクエア決済",811],["ホテルアオイ",1903],["フレッシュ市場",718],["サンプル加盟店",646]],
+    "2026-05": [["バーガーハウス",444],["バーガーハウス",896],["ストアQ",214],["まる屋",618],["フレッシュ市場",1194],["フレッシュ市場",884],["ストアQ",787],["ストアQ",115],["フレッシュ市場",993],["ファミリーグリル",537],["フレッシュ市場",688],["まる屋",687],["ファミリーグリル",508],["定食のとん平",861],["カフェ・ノワ",443],["カフェ・ノワ",616],["ファミリーグリル",457],["カフェ・ノワ",516],["まる屋",667],["ラーメン十番",1267],["フレッシュ市場",1177],["ファミリーグリル",865],["ストアQ",309],["ファミリーグリル",654],["デイリーマート",565],["ファミリーグリル",1123],["ストアQ",323],["まる屋",877],["フレッシュ市場",1214],["まる屋",828],["フレッシュ市場",1050],["まる屋",565],["フレッシュ市場",1454],["まる屋",862],["ストアQ",801],["ファミリーグリル",520],["まる屋",718],["フレッシュ市場",718],["ファミリーグリル",732],["サンクスストア",447],["まる屋",561],["まる屋",494],["サンクスストア",452],["フレッシュ市場",567],["ストアQ",578],["まる屋",2044]],
+    "2026-06": [["まる屋",644],["フレッシュ市場",1026],["フレッシュ市場",503],["フレッシュ市場",381],["ファミリーグリル",794],["フレッシュ市場",1375],["ファミリーグリル",926],["デイリーマート",351],["フレッシュ市場",1444],["フレッシュ市場",1239],["フレッシュ市場",946],["フレッシュ市場",589],["フレッシュ市場",1248],["フレッシュ市場",769],["まる屋",495],["ストアQ",424],["バーガーハウス",860],["ホームプラス",814],["フレッシュ市場",339],["ラーメン十番",1066],["定食のとん平",1117],["フレッシュ市場",796],["カフェ・ノワ",564],["まる屋",564],["ラーメン十番",1259],["ストアQ",127],["サンプル加盟店",527],["フレッシュ市場",395],["フレッシュ市場",482],["ストアQ",588],["フレッシュ市場",1522],["フレッシュ市場",274],["バーガーハウス",762],["ファミリーグリル",455],["ホームプラス",444],["ファミリーグリル",763],["カフェ・ノワ",449],["ストアQ",481],["サンクスストア",142],["ファミリーグリル",790],["ファミリーグリル",553],["フレッシュ市場",814],["ストアQ",698],["サンクスストア",391],["バーガーハウス",884],["まる屋",892],["定食のとん平",772],["フレッシュ市場",2412]],
+    "2026-07": [["まる屋",600],["ファミリーグリル",904],["ラーメン十番",1246],["フレッシュ市場",534],["ファミリーグリル",679],["デイリーマート",609],["ファミリーグリル",466],["まる屋",789],["バーガーハウス",435],["ホームプラス",574],["バーガーハウス",848],["ファミリーグリル",886],["定食のとん平",1085],["ファミリーグリル",453],["フレッシュ市場",1152],["ファミリーグリル",687],["ストアQ",290],["サンプル加盟店",702],["ラーメン十番",898],["まる屋",600],["ファミリーグリル",751],["バーガーハウス",797],["バーガーハウス",625],["バーガーハウス",657],["デイリーマート",785],["フレッシュ市場",1331],["フレッシュ市場",1154],["ラーメン十番",1280],["ストアQ",151],["まる屋",642],["フレッシュ市場",601],["バーガーハウス",583],["フレッシュ市場",1578],["ラーメン十番",900],["フレッシュ市場",326],["ファミリーグリル",1133],["ストアQ",188],["ストアQ",391],["ファミリーグリル",736],["フレッシュ市場",967],["フレッシュ市場",246],["バーガーハウス",471],["まる屋",563],["バーガーハウス",893],["ファミリーグリル",995],["フレッシュ市場",1210],["フレッシュ市場",810],["フレッシュ市場",300],["まる屋",640],["ファミリーグリル",826],["フレッシュ市場",750],["まる屋",805],["フレッシュ市場",1522],["デイリーマート",737],["ラーメン十番",499]],
+  };
+
+  function categoryOf(m) {
+    if (["まる屋","ファミリーグリル","バーガーハウス","ラーメン十番","カフェ・ノワ","定食のとん平"].includes(m)) return "外食";
+    if (["デイリーマート","サンクスストア"].includes(m)) return "コンビニ";
+    if (["フレッシュ市場","ストアQ","ホームプラス","アパレルZ"].includes(m)) return "スーパー・小売";
+    if (["みなと空港ターミナル","北陽鉄道","ホテルアオイ"].includes(m)) return "交通・旅行";
+    return "その他";
+  }
+
+  const catTotal = {};
+  const merchantTotal = {};
+  Object.values(smbcTx).flat().forEach(([merchant, amt]) => {
+    const cat = categoryOf(merchant);
+    catTotal[cat] = (catTotal[cat] || 0) + amt;
+    merchantTotal[merchant] = (merchantTotal[merchant] || 0) + amt;
+  });
+
+  const catOrder = ["スーパー・小売", "外食", "コンビニ", "その他", "交通・旅行"];
+  const catMax = Math.max(...Object.values(catTotal));
+  const catBarsEl = document.getElementById("categoryBars");
+  catOrder.filter(c => catTotal[c]).forEach(c => {
+    const row = document.createElement("div");
+    row.className = "cat-row";
+    const pct = Math.round((catTotal[c] / catMax) * 100);
+    row.innerHTML = `<div class="cat-name">${c}</div><div class="cat-track"><div class="cat-fill" style="width:0%"></div></div><div class="cat-value">¥${catTotal[c].toLocaleString()}</div>`;
+    catBarsEl.appendChild(row);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      row.querySelector(".cat-fill").style.width = pct + "%";
+    }));
+  });
+
+  const merchantListEl = document.getElementById("merchantList");
+  const topMerchants = Object.entries(merchantTotal).sort((a,b) => b[1]-a[1]).slice(0, 8);
+  merchantListEl.innerHTML = `<div class="merchant-list"><h3>店舗別トップ8</h3>${
+    topMerchants.map(([name, v]) => `<div class="merchant-item"><span class="m-name">${name}</span><span class="m-value">¥${v.toLocaleString()}</span></div>`).join("")
+  }</div>`;
+
+  // ==== 定額・サブスクタブ（楽天カードで検出した繰り返し請求）====
+  function mlabel(m) {
+    const [y, mo] = m.split("-");
+    return y.slice(2) + "年" + (mo[0]==="0" ? mo[1] : mo) + "月";
+  }
+
+  const subs = [
+    {
+      name: "ケーブルネット サービス利用料", type: "定額",
+      history: [["2026-02",3980],["2026-03",3980],["2026-04",4015],["2026-05",3980],["2026-06",3980],["2026-08",3980]],
+    },
+    {
+      name: "SAMPLE *AI ASSISTANT SUBS", type: "定額（為替変動あり）",
+      history: [["2024-12",3120],["2025-01",3085],["2025-05",3210],["2025-07",3268],["2025-09",3341],["2025-12",3502],["2026-08",1380]],
+    },
+    {
+      name: "モバイル通信料", type: "実費精算",
+      history: [["2025-11",1790],["2026-01",2640],["2026-02",2515],["2026-03",2088],["2026-04",2274],["2026-05",2930],["2026-06",2371],["2026-07",2183],["2026-08",1962]],
+    },
+    {
+      name: "電気料金（架空電力）", type: "実費精算",
+      history: [["2025-06",5290],["2025-07",3480],["2025-08",4066],["2025-09",6845],["2025-11",7014],["2025-12",4237],["2026-01",2980],["2026-02",3711],["2026-03",6520],["2026-06",3592],["2026-07",3348],["2026-08",4489]],
+    },
+  ];
+  const subsTableEl = document.getElementById("subsTable");
+  subs.forEach(s => {
+    const amounts = s.history.map(h => h[1]);
+    const latest = amounts[amounts.length - 1];
+    const avgSub = Math.round(amounts.reduce((a,b)=>a+b,0) / amounts.length);
+    const hMax = Math.max(...amounts);
+    const card = document.createElement("div");
+    card.className = "subs-card";
+    card.innerHTML = `
+      <div class="s-top">
+        <span class="s-name">${s.name}</span>
+        <span class="s-badge">${s.type}</span>
+      </div>
+      <div class="s-latest">¥${latest.toLocaleString()}<span style="font-size:12px;font-weight:500;color:var(--text-muted);"> （直近）</span></div>
+      <div class="s-meta">平均 ¥${avgSub.toLocaleString()} ・ 確認できた月数 ${amounts.length}か月</div>
+      <div class="s-history">
+        ${s.history.map(([m, v]) => `
+          <div class="s-hist-row">
+            <span class="s-hist-month">${mlabel(m)}支払</span>
+            <div class="s-hist-track"><div class="s-hist-fill" style="width:${Math.round(v/hMax*100)}%"></div></div>
+            <span class="s-hist-value">¥${v.toLocaleString()}</span>
+          </div>
+        `).join("")}
+      </div>
+    `;
+    subsTableEl.appendChild(card);
+  });
+
+  // ==== タブ切り替え ====
+  const tabBtns = document.querySelectorAll(".tab-btn");
+  const panels = {
+    trend: document.getElementById("panel-trend"),
+    category: document.getElementById("panel-category"),
+    subs: document.getElementById("panel-subs"),
+  };
+  let activeTab = "trend";
+  let tabSwapping = false;
+  tabBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.tab;
+      if (target === activeTab || tabSwapping) return;
+      tabSwapping = true;
+      const fromPanel = panels[activeTab];
+      fromPanel.classList.add("fading");
+      setTimeout(() => {
+        fromPanel.classList.add("hidden");
+        panels[target].classList.remove("hidden");
+        tabBtns.forEach(b => { b.classList.toggle("active", b.dataset.tab === target); b.setAttribute("aria-selected", b.dataset.tab === target); });
+        activeTab = target;
+        const toPanel = panels[target];
+        toPanel.classList.add("fading");
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          toPanel.classList.remove("fading");
+          fromPanel.classList.remove("fading");
+          tabSwapping = false;
+        }));
+      }, 180);
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
