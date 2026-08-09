@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>イベント収支管理</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+</head>
+<body>
+
+<!-- ========== 認証ゲート ========== -->
+<div id="gate" class="gate">
+  <div class="gate-card">
+    <div class="logo big">¥</div>
+
+    <!-- 読み込み中 -->
+    <div data-gate="loading">
+      <h1>イベント収支管理</h1>
+      <p class="gate-msg">接続しています…</p>
+    </div>
+
+    <!-- 未ログイン -->
+    <div data-gate="signin" hidden>
+      <h1>イベント収支管理</h1>
+      <p class="gate-msg">許可されたGoogleアカウントでログインしてください。</p>
+      <button class="btn primary lg" id="signInBtn">
+        <svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45 24.5c0-1.6-.1-2.7-.4-3.9H24v7.1h12c-.2 1.9-1.5 4.7-4.4 6.6l6.7 5.2C42.2 36 45 30.8 45 24.5z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-1.9 14.5-5.3l-6.9-5.3c-1.8 1.3-4.3 2.2-7.6 2.2-5.8 0-10.7-3.8-12.5-9.1l-7.1 5.5C8.1 41.1 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.5 28.5c-.5-1.4-.7-2.9-.7-4.5s.3-3.1.7-4.5l-7.1-5.5C2.9 17 2 20.4 2 24s.9 7 2.4 10z"/><path fill="#EA4335" d="M24 10.6c3.6 0 6.1 1.6 7.5 2.9l6.1-6C33.9 4.1 29.9 2 24 2 15.4 2 8.1 6.9 4.4 14l7.1 5.5C13.3 14.4 18.2 10.6 24 10.6z"/></svg>
+        Googleでログイン
+      </button>
+      <p class="gate-note" id="signinErr" hidden></p>
+    </div>
+
+    <!-- 許可されていない -->
+    <div data-gate="denied" hidden>
+      <h1>アクセスが許可されていません</h1>
+      <p class="gate-msg">
+        このアプリは、あらかじめ登録された利用者のみが使えます。<br>
+        下のユーザーIDを管理者に伝えて、登録を依頼してください。
+      </p>
+      <label class="gate-label">あなたのアカウント</label>
+      <div class="gate-field" id="deniedEmail"></div>
+      <label class="gate-label">ユーザーID（UID）</label>
+      <div class="gate-field mono" id="deniedUid"></div>
+      <div class="gate-actions">
+        <button class="btn" id="copyUidBtn">UIDをコピー</button>
+        <button class="btn" id="signOutBtn2">別のアカウントでログイン</button>
+      </div>
+    </div>
+
+    <!-- 設定エラー -->
+    <div data-gate="config" hidden>
+      <h1>設定が未完了です</h1>
+      <p class="gate-msg" id="configMsg"></p>
+    </div>
+
+    <!-- 接続できない・原因表示 -->
+    <div data-gate="trouble" hidden>
+      <h1>接続できませんでした</h1>
+      <p class="gate-msg" id="troubleMsg"></p>
+      <label class="gate-label">エラーの内容</label>
+      <div class="gate-field mono" id="troubleDetail"></div>
+      <div class="gate-actions">
+        <button class="btn primary" id="retryBtn">もう一度試す</button>
+        <button class="btn" id="signOutBtn3">ログアウト</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== アプリ本体 ========== -->
+<div id="appShell" hidden>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="logo">¥</div>
+        <div>
+          <h1>イベント収支管理</h1>
+          <div class="sub">試算 · 予算 · 実績</div>
+        </div>
+        <div class="topbar-actions">
+          <span class="save-ind" id="saveInd" data-s="idle"><i></i><span>保存済み</span></span>
+          <button class="btn ghost sm" id="refreshBtn" title="クラウドから最新のデータを取り直します">↻ 更新</button>
+          <span class="user-chip" id="userChip"></span>
+          <button class="btn ghost sm" id="themeBtn" title="表示テーマ切替">◐ テーマ</button>
+          <button class="btn ghost sm" id="signOutBtn">ログアウト</button>
+        </div>
+      </div>
+      <div class="tabs" id="tabs">
+        <button class="tab" data-view="events">イベント一覧</button>
+        <button class="tab" data-view="sim">収支シミュレーション</button>
+        <button class="tab" data-view="actual">実績管理</button>
+        <button class="tab" data-view="report">収支一覧</button>
+        <button class="tab" data-view="settings">料金・費目設定</button>
+        <button class="tab" data-view="help">使い方</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap" id="app"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

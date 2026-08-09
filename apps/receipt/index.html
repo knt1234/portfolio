@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>領収書発行システム</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<style>
+  :root {
+    --accent: #2ca9a3;
+    --bg: #f4f5f6;
+    --card-bg: #ffffff;
+    --border: #d7dadd;
+    --text: #2b2f33;
+    --muted: #8a9198;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .app {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+
+  .panel {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .panel h2 {
+    font-size: 15px;
+    margin: 0 0 14px;
+    border-left: 4px solid var(--accent);
+    padding-left: 8px;
+  }
+
+  .company-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .company-tab {
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    background: #fff;
+  }
+  .company-tab.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  .company-edit-grid {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 8px 12px;
+    align-items: center;
+    font-size: 13px;
+  }
+  .company-edit-grid label { color: var(--muted); }
+  .company-edit-grid input, .company-edit-grid textarea {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .company-edit-grid textarea { resize: vertical; min-height: 50px; }
+
+  .entry-form {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr) auto;
+    gap: 10px;
+    align-items: end;
+    margin-bottom: 14px;
+  }
+  .field label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .field input, .field select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+  }
+  button {
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .btn-add { background: var(--accent); color: #fff; height: 38px; }
+  .btn-add:hover { opacity: 0.9; }
+  .btn-danger { background: #fff; color: #c0392b; border: 1px solid #e2b4ac; padding: 5px 10px; font-weight: 400; }
+  .btn-secondary { background: #fff; color: var(--text); border: 1px solid var(--border); }
+  .btn-print { background: #222; color: #fff; padding: 12px 22px; font-size: 14px; }
+
+  table.entry-list { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.entry-list th, table.entry-list td {
+    border-bottom: 1px solid var(--border);
+    padding: 8px 6px;
+    text-align: left;
+  }
+  table.entry-list th { color: var(--muted); font-weight: 500; font-size: 12px; }
+  .empty-note { color: var(--muted); font-size: 13px; padding: 10px 0; }
+
+  .footer-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+  }
+  .count-badge {
+    display: inline-block;
+    background: #eef7f6;
+    color: var(--accent);
+    border-radius: 12px;
+    padding: 2px 10px;
+    font-size: 12px;
+    margin-left: 6px;
+  }
+
+  /* ---- Receipt print layout (A4, 2 receipts per sheet) ---- */
+  #print-area { display: none; }
+
+  .a4-sheet {
+    width: 210mm;
+    height: 297mm;
+    margin: 0 auto 10mm;
+    background: #fff;
+    padding: 8mm 10mm;
+    box-sizing: border-box;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+  }
+  .receipt-half {
+    position: relative;
+    flex: 1 1 50%;
+    border: 1px solid #333;
+    padding: 8mm 10mm;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .cut-line {
+    flex: 0 0 auto;
+    height: 6mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cut-line::before {
+    content: "";
+    display: block;
+    width: 100%;
+    border-top: 1px dashed #999;
+  }
+
+  .receipt-corner {
+    position: absolute;
+    top: -1px;
+    left: 24px;
+    width: 0;
+    height: 0;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-top: 16px solid var(--accent);
+  }
+  .receipt-title {
+    text-align: left;
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: 7px;
+    margin: 2px 0 6px;
+  }
+  .receipt-row-top {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 6px;
+  }
+  .receipt-date { font-size: 16px; }
+  .receipt-name-row {
+    display: flex;
+    align-items: flex-end;
+    margin: 4px 0 8px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 6px;
+  }
+  .receipt-name-row .val {
+    flex: none;
+    padding: 2px 10px 2px 0;
+    font-size: 28px;
+    min-height: 28px;
+  }
+  .receipt-name-row .suffix { margin-left: 12px; font-size: 20px; }
+  .receipt-name-row .fill { flex: 1; }
+
+  .receipt-amount-row {
+    display: flex;
+    align-items: baseline;
+    border-bottom: 2px solid #333;
+    padding: 10px 0 8px;
+    margin: 10px 0 8px;
+  }
+  .receipt-amount-row .yen { font-size: 32px; font-weight: bold; margin-right: 8px; }
+  .receipt-amount-row .val {
+    flex: none;
+    max-width: 240px;
+    font-size: 38px;
+    font-weight: bold;
+    text-align: right;
+    letter-spacing: 1px;
+  }
+  .receipt-amount-row .dash { margin-left: 10px; font-size: 32px; }
+  .receipt-amount-row .fill { flex: 1; }
+
+  .receipt-desc-row {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 4px;
+    font-size: 16px;
+  }
+  .receipt-desc-row .label { margin-right: 10px; }
+  .receipt-desc-row .val { flex: 1; }
+
+  .receipt-thanks {
+    font-size: 14px;
+    margin: 2px 0 10px;
+  }
+
+  .receipt-issuer-box {
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: left;
+    margin-left: auto;
+    margin-top: auto;
+    width: max-content;
+    max-width: 100%;
+    white-space: nowrap;
+  }
+
+  @media print {
+    body * { visibility: hidden; }
+    #print-area, #print-area * { visibility: visible; }
+    #print-area { display: block; position: absolute; left: 0; top: 0; }
+    .a4-sheet { margin: 0; box-shadow: none; }
+  }
+
+  #authGate {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    text-align: center;
+    padding: 24px;
+  }
+  #authGate h2 { font-size: 18px; margin: 0; }
+  #authGate p { color: var(--muted); font-size: 13px; margin: 0; max-width: 320px; }
+  #btnGoogleLogin {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  #btnGoogleLogin:hover { background: #f5f5f5; }
+  #authDeniedNote { color: #c0392b; font-size: 13px; display: none; }
+  #userBar {
+    display: none;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 8px 24px 0;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  #btnLogout {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 4px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--text);
+  }
+</style>
+</head>
+<body>
+
+<div id="authGate">
+  <h2>領収書発行システム</h2>
+  <p>このアプリは許可されたGoogleアカウントのみ利用できます。</p>
+  <button id="btnGoogleLogin">Googleでログイン</button>
+  <p id="authDeniedNote">このGoogleアカウントには利用権限がありません。許可されたアカウントでログインし直してください。</p>
+</div>
+
+<div id="userBar">
+  <span id="userEmailLabel"></span>
+  <button id="btnLogout">ログアウト</button>
+</div>
+
+<div class="app" id="appRoot" style="display:none;">
+  <h1>領収書発行システム</h1>
+  <div class="sub">スクールごとに領収書を作成し、まとめて1つのPDFとして出力します。</div>
+
+  <!-- Company selection & fixed info -->
+  <div class="panel">
+    <h2>1. 発行会社を選択・編集</h2>
+    <div class="company-tabs" id="companyTabs"></div>
+    <div class="company-edit-grid">
+      <label>社名</label>
+      <input type="text" id="companyName">
+      <label>登録番号(インボイス)</label>
+      <input type="text" id="companyInvoice" placeholder="T1234567890123">
+      <label>住所・所在地等</label>
+      <textarea id="companyAddress" placeholder="東京都新宿区〇〇株式会社△△"></textarea>
+    </div>
+  </div>
+
+  <!-- Entry form -->
+  <div class="panel">
+    <h2>2. 領収書を追加（決済ごとに1件）</h2>
+    <div class="entry-form">
+      <div class="field">
+        <label>日付</label>
+        <input type="date" id="fDate">
+      </div>
+      <div class="field">
+        <label>氏名</label>
+        <input type="text" id="fName" placeholder="山田 太郎">
+      </div>
+      <div class="field">
+        <label>金額（円）</label>
+        <input type="number" id="fAmount" placeholder="30000">
+      </div>
+      <div class="field">
+        <label>但し書き</label>
+        <select id="fDesc"></select>
+      </div>
+      <button class="btn-add" id="btnAddEntry">＋ 追加</button>
+    </div>
+
+    <table class="entry-list" id="entryTable">
+      <thead>
+        <tr><th>会社</th><th>日付</th><th>氏名</th><th>金額</th><th>但し書き</th><th></th></tr>
+      </thead>
+      <tbody id="entryTbody"></tbody>
+    </table>
+    <div class="empty-note" id="emptyNote">まだ領収書がありません。上のフォームから追加してください。</div>
+  </div>
+
+  <!-- Bulk paste -->
+  <div class="panel" id="bulkPanel">
+    <h2>2.5 テキストを貼り付けて一括作成</h2>
+    <div class="sub" style="margin-bottom:10px;">
+      日付・氏名・金額・「銀振」の有無をタブ区切りのテキストから読み取り、まとめて追加します（現在選択中の会社に追加されます）。<br>
+      「銀振」を含む行は「受講料として」、含まない行は「受講料として(クレジット利用)」になります。
+    </div>
+    <textarea id="bulkText" placeholder="2026/07/19&#9;&#9;山田太郎 ﾔﾏﾀﾞﾀﾛｳ&#9;NCA&#9;¥550,000&#9;&#9;&#9;&#9;CBS銀振" style="width:100%; min-height:110px; padding:10px; border:1px solid var(--border); border-radius:6px; font-size:13px; font-family:monospace;"></textarea>
+    <div style="margin-top:10px;">
+      <button class="btn-add" id="btnBulkAdd">貼り付けた内容を追加</button>
+    </div>
+    <div class="empty-note" id="bulkMetariseNote" style="display:none;">metariseにはこの一括貼り付け機能は使用できません。手入力で追加してください。</div>
+  </div>
+
+  <!-- Output -->
+  <div class="panel">
+    <h2>3. まとめて出力</h2>
+    <div class="footer-actions">
+      <div>作成済み領収書<span class="count-badge" id="totalCount">0件</span></div>
+      <div>
+        <button class="btn-secondary" id="btnClearAll">全件削除</button>
+        <button class="btn-print" id="btnPrint">PDFをダウンロード</button>
+      </div>
+    </div>
+    <div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">
+      <a href="https://drive.google.com/drive/folders/1pVS0SkNMIiLIdEPXD8RS--CxvyDH9pHL" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:6px; color:var(--accent); font-size:13px; font-weight:600; text-decoration:none;">
+        📁 領収書格納用ドライブフォルダを開く
+      </a>
+    </div>
+  </div>
+</div>
+
+<div id="print-area"></div>
+
+<script>
+const STORAGE_KEY = "receiptApp_v1";
+
+const DESC_OPTIONS_DEFAULT = [
+  "受講料として(クレジット利用)",
+  "受講料として"
+];
+const DESC_OPTIONS_METARISE = [
+  "研修参加費として"
+];
+
+const DEFAULT_COMPANIES = [
+  { id: "metarise", name: "株式会社metarise", invoice: "T6012401034652", address: "150-0031\n東京都渋谷区桜丘町 31-14 603号室" },
+  { id: "cbs", name: "CBS出版株式会社", invoice: "T1011001144890", address: "150-0031\n東京都渋谷区桜丘町 31-14 603号室" },
+  { id: "soshi", name: "株式会社創智", invoice: "T3011001145929", address: "150-0031\n東京都渋谷区桜丘町 31-14 603号室" },
+  { id: "mirai", name: "未来推進株式会社", invoice: "", address: "150-0043\n東京都渋谷区道玄坂1丁目2番3号 渋谷フクラス17階" }
+];
+
+let state = loadState();
+let activeCompanyId = state.companies[0].id;
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed.companies && parsed.entries) return parsed;
+    }
+  } catch (e) {}
+  return { companies: JSON.parse(JSON.stringify(DEFAULT_COMPANIES)), entries: [] };
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function getCompany(id) {
+  return state.companies.find(c => c.id === id);
+}
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+
+function formatDateJP(dateStr) {
+  if (!dateStr) return "";
+  const [y,m,d] = dateStr.split("-");
+  return `${y}年${Number(m)}月${Number(d)}日`;
+}
+
+function formatYen(amount) {
+  const n = Number(amount) || 0;
+  return n.toLocaleString("ja-JP");
+}
+
+// ---------- Render: company tabs & edit box ----------
+function renderCompanyTabs() {
+  const wrap = document.getElementById("companyTabs");
+  wrap.innerHTML = "";
+  state.companies.forEach(c => {
+    const tab = document.createElement("div");
+    tab.className = "company-tab" + (c.id === activeCompanyId ? " active" : "");
+    tab.textContent = c.name;
+    tab.onclick = () => {
+      activeCompanyId = c.id;
+      renderAll();
+    };
+    wrap.appendChild(tab);
+  });
+}
+
+function renderCompanyEdit() {
+  const c = getCompany(activeCompanyId);
+  document.getElementById("companyName").value = c.name;
+  document.getElementById("companyInvoice").value = c.invoice;
+  document.getElementById("companyAddress").value = c.address;
+}
+
+function bindCompanyEditEvents() {
+  document.getElementById("companyName").oninput = e => {
+    getCompany(activeCompanyId).name = e.target.value;
+    saveState();
+    renderCompanyTabs();
+    renderEntryTable();
+  };
+  document.getElementById("companyInvoice").oninput = e => {
+    getCompany(activeCompanyId).invoice = e.target.value;
+    saveState();
+  };
+  document.getElementById("companyAddress").oninput = e => {
+    getCompany(activeCompanyId).address = e.target.value;
+    saveState();
+  };
+}
+
+// ---------- Render: entry form ----------
+function renderDescOptions() {
+  const sel = document.getElementById("fDesc");
+  sel.innerHTML = "";
+  const options = activeCompanyId === "metarise" ? DESC_OPTIONS_METARISE : DESC_OPTIONS_DEFAULT;
+  options.forEach(opt => {
+    const o = document.createElement("option");
+    o.value = opt;
+    o.textContent = opt;
+    sel.appendChild(o);
+  });
+}
+
+function parseBulkText(text) {
+  const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+  const results = [];
+  lines.forEach(line => {
+    const normalized = line.replace(/　/g, " ");
+    const parts = normalized.split("\t").map(p => p.trim()).filter(p => p.length > 0);
+
+    const dateMatch = normalized.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})/);
+    const date = dateMatch
+      ? `${dateMatch[1]}-${dateMatch[2].padStart(2, "0")}-${dateMatch[3].padStart(2, "0")}`
+      : "";
+
+    const amountMatch = normalized.match(/¥\s*([\d,]+)/);
+    const amount = amountMatch ? Number(amountMatch[1].replace(/,/g, "")) : 0;
+
+    let name = "";
+    for (const p of parts) {
+      if (/[一-龠ぁ-んァ-ヶ]/.test(p) && !p.startsWith("¥") && !/^\d{4}\//.test(p)) {
+        name = p.split(" ")[0];
+        break;
+      }
+    }
+
+    const desc = /銀振/.test(normalized) ? "受講料として" : "受講料として(クレジット利用)";
+
+    if (name && amount > 0 && date) {
+      results.push({ date, name, amount, desc });
+    }
+  });
+  return results;
+}
+
+function addBulkEntries() {
+  if (activeCompanyId === "metarise") {
+    alert("metariseにはこの一括貼り付け機能は使用できません。");
+    return;
+  }
+  const text = document.getElementById("bulkText").value;
+  const parsed = parseBulkText(text);
+  if (parsed.length === 0) {
+    alert("読み取れる行が見つかりませんでした。テキスト形式をご確認ください。");
+    return;
+  }
+  parsed.forEach(p => {
+    state.entries.push({
+      id: Date.now() + "_" + Math.random().toString(36).slice(2, 7),
+      companyId: activeCompanyId,
+      date: p.date, name: p.name, amount: p.amount, desc: p.desc
+    });
+  });
+  saveState();
+  document.getElementById("bulkText").value = "";
+  renderEntryTable();
+  alert(`${parsed.length}件の領収書を追加しました。`);
+}
+
+function addEntry() {
+  const date = document.getElementById("fDate").value || todayStr();
+  const name = document.getElementById("fName").value.trim();
+  const amount = document.getElementById("fAmount").value;
+  const desc = document.getElementById("fDesc").value;
+
+  if (!name) { alert("氏名を入力してください。"); return; }
+  if (!amount || Number(amount) <= 0) { alert("金額を正しく入力してください。"); return; }
+
+  state.entries.push({
+    id: Date.now() + "_" + Math.random().toString(36).slice(2,7),
+    companyId: activeCompanyId,
+    date, name, amount: Number(amount), desc
+  });
+  saveState();
+
+  document.getElementById("fName").value = "";
+  document.getElementById("fAmount").value = "";
+  renderEntryTable();
+}
+
+function removeEntry(id) {
+  state.entries = state.entries.filter(e => e.id !== id);
+  saveState();
+  renderEntryTable();
+}
+
+function renderEntryTable() {
+  const tbody = document.getElementById("entryTbody");
+  tbody.innerHTML = "";
+  const emptyNote = document.getElementById("emptyNote");
+  const table = document.getElementById("entryTable");
+
+  if (state.entries.length === 0) {
+    table.style.display = "none";
+    emptyNote.style.display = "block";
+  } else {
+    table.style.display = "table";
+    emptyNote.style.display = "none";
+    state.entries.forEach(e => {
+      const c = getCompany(e.companyId);
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${c ? c.name : "(削除済み)"}</td>
+        <td>${formatDateJP(e.date)}</td>
+        <td>${e.name} 様</td>
+        <td>¥${formatYen(e.amount)}</td>
+        <td>${e.desc}</td>
+        <td><button class="btn-danger" data-id="${e.id}">削除</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    tbody.querySelectorAll("button[data-id]").forEach(btn => {
+      btn.onclick = () => removeEntry(btn.dataset.id);
+    });
+  }
+  document.getElementById("totalCount").textContent = state.entries.length + "件";
+}
+
+// ---------- Print / PDF output ----------
+function receiptHalfHTML(e) {
+  const c = getCompany(e.companyId) || { name: "", invoice: "", address: "" };
+  return `
+    <div class="receipt-corner"></div>
+    <div class="receipt-title">領収書</div>
+    <div class="receipt-row-top" style="justify-content: flex-end;">
+      <div class="receipt-date">${formatDateJP(e.date)}</div>
+    </div>
+    <div class="receipt-name-row">
+      <div class="val">${e.name}</div>
+      <div class="suffix">様</div>
+      <div class="fill"></div>
+    </div>
+    <div class="receipt-amount-row">
+      <div class="yen">¥</div>
+      <div class="val">${formatYen(e.amount)}</div>
+      <div class="dash">－</div>
+      <div class="fill"></div>
+    </div>
+    <div class="receipt-desc-row">
+      <div class="label">但</div>
+      <div class="val">${e.desc}</div>
+    </div>
+    <div class="receipt-thanks">上記正に領収いたしました</div>
+    <div class="receipt-issuer-box">
+      ${c.invoice ? c.invoice + "<br>" : ""}
+      ${c.name}<br>
+      ${(c.address || "").replace(/\n/g, "<br>")}
+    </div>
+  `;
+}
+
+function buildPrintArea() {
+  const area = document.getElementById("print-area");
+  area.innerHTML = "";
+
+  for (let i = 0; i < state.entries.length; i += 2) {
+    const first = state.entries[i];
+    const second = state.entries[i + 1];
+
+    const sheet = document.createElement("div");
+    sheet.className = "a4-sheet";
+
+    const firstHalf = document.createElement("div");
+    firstHalf.className = "receipt-half";
+    firstHalf.innerHTML = receiptHalfHTML(first);
+    sheet.appendChild(firstHalf);
+
+    sheet.appendChild(document.createElement("div")).className = "cut-line";
+
+    const secondHalf = document.createElement("div");
+    secondHalf.className = "receipt-half";
+    if (second) {
+      secondHalf.innerHTML = receiptHalfHTML(second);
+    } else {
+      secondHalf.style.visibility = "hidden";
+    }
+    sheet.appendChild(secondHalf);
+
+    area.appendChild(sheet);
+  }
+}
+
+function stripCompanySuffix(name) {
+  return (name || "").replace(/株式会社/g, "").trim();
+}
+
+const PX_TO_MM = px => px * 25.4 / 96;
+
+async function downloadAllPDF() {
+  if (state.entries.length === 0) {
+    alert("出力する領収書がありません。");
+    return;
+  }
+
+  const btn = document.getElementById("btnPrint");
+  const originalLabel = btn.textContent;
+  btn.textContent = "PDF作成中…";
+  btn.disabled = true;
+
+  try {
+    buildPrintArea();
+    const area = document.getElementById("print-area");
+    area.style.display = "block";
+    area.style.position = "fixed";
+    area.style.left = "-99999px";
+    area.style.top = "0";
+
+    await new Promise(r => setTimeout(r, 50));
+
+    const pages = area.querySelectorAll(".a4-sheet");
+    let pdf = null;
+
+    for (let i = 0; i < pages.length; i++) {
+      const page = pages[i];
+      const canvas = await html2canvas(page, { scale: 2, backgroundColor: "#ffffff" });
+      const imgData = canvas.toDataURL("image/png");
+      const wmm = PX_TO_MM(page.offsetWidth);
+      const hmm = PX_TO_MM(page.offsetHeight);
+      const orientation = wmm > hmm ? "l" : "p";
+
+      if (!pdf) {
+        pdf = new jspdf.jsPDF({ orientation, unit: "mm", format: [wmm, hmm] });
+      } else {
+        pdf.addPage([wmm, hmm], orientation);
+      }
+      pdf.addImage(imgData, "PNG", 0, 0, wmm, hmm);
+    }
+
+    area.style.display = "none";
+    area.style.position = "";
+    area.style.left = "";
+
+    const first = state.entries[0];
+    const company = getCompany(first.companyId) || { name: "" };
+    const filename = `${first.name}様_領収書（${stripCompanySuffix(company.name)}）.pdf`;
+    pdf.save(filename);
+  } catch (err) {
+    alert("PDFの作成に失敗しました。時間をおいて再度お試しください。");
+    console.error(err);
+  } finally {
+    btn.textContent = originalLabel;
+    btn.disabled = false;
+  }
+}
+
+// ---------- Init ----------
+function renderBulkPanel() {
+  const isMetarise = activeCompanyId === "metarise";
+  document.getElementById("bulkText").style.display = isMetarise ? "none" : "block";
+  document.getElementById("btnBulkAdd").style.display = isMetarise ? "none" : "inline-block";
+  document.getElementById("bulkMetariseNote").style.display = isMetarise ? "block" : "none";
+}
+
+function renderAll() {
+  renderCompanyTabs();
+  renderCompanyEdit();
+  renderDescOptions();
+  renderEntryTable();
+  renderBulkPanel();
+}
+
+function initApp() {
+  document.getElementById("fDate").value = todayStr();
+  document.getElementById("btnAddEntry").onclick = addEntry;
+  document.getElementById("btnBulkAdd").onclick = addBulkEntries;
+  document.getElementById("btnPrint").onclick = downloadAllPDF;
+  document.getElementById("btnClearAll").onclick = () => {
+    if (confirm("すべての領収書データを削除します。よろしいですか？")) {
+      state.entries = [];
+      saveState();
+      renderEntryTable();
+    }
+  };
+
+  bindCompanyEditEvents();
+  renderAll();
+}
+
+// ---------- Google login gate ----------
+// このアプリを使えるのは下記メールアドレスのGoogleアカウントのみです。
+const ALLOWED_EMAILS = [
+  "kenta0720fila@gmail.com",
+  "helpdesk.customer.center@gmail.com"
+];
+
+// Firebaseプロジェクト作成後、この設定値を実際の値に書き換えてください。
+// (Firebaseコンソール > プロジェクトの設定 > マイアプリ > SDK の設定と構成 から取得)
+const firebaseConfig = {
+  apiKey: "AIzaSyDHU3PUI-kDdiSo8aZBEPad4SoaqGuk5WQ",
+  authDomain: "receipt-generator-jp2026.firebaseapp.com",
+  projectId: "receipt-generator-jp2026",
+  storageBucket: "receipt-generator-jp2026.firebasestorage.app",
+  messagingSenderId: "165637150952",
+  appId: "1:165637150952:web:faf38415b4b277e296115d"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+googleProvider.setCustomParameters({ hd: "gmail.com" });
+
+const authGate = document.getElementById("authGate");
+const userBar = document.getElementById("userBar");
+const appRoot = document.getElementById("appRoot");
+const authDeniedNote = document.getElementById("authDeniedNote");
+let appInitialized = false;
+
+document.getElementById("btnGoogleLogin").onclick = () => {
+  authDeniedNote.style.display = "none";
+  auth.signInWithPopup(googleProvider).catch(err => {
+    console.error(err);
+    alert("ログインに失敗しました。時間をおいて再度お試しください。");
+  });
+};
+
+document.getElementById("btnLogout").onclick = () => auth.signOut();
+
+auth.onAuthStateChanged(user => {
+  if (user && ALLOWED_EMAILS.includes(user.email)) {
+    authGate.style.display = "none";
+    userBar.style.display = "flex";
+    appRoot.style.display = "block";
+    document.getElementById("userEmailLabel").textContent = user.email;
+    if (!appInitialized) {
+      appInitialized = true;
+      initApp();
+    }
+  } else if (user) {
+    // ログインはしたが許可されていないアカウント
+    auth.signOut();
+    authGate.style.display = "flex";
+    userBar.style.display = "none";
+    appRoot.style.display = "none";
+    authDeniedNote.style.display = "block";
+  } else {
+    authGate.style.display = "flex";
+    userBar.style.display = "none";
+    appRoot.style.display = "none";
+  }
+});
+</script>
+
+</body>
+</html>
