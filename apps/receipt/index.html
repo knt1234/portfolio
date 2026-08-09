@@ -3,11 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>領収書発行システム</title>
+<title>領収書発行システム（デモ）</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<link rel="stylesheet" href="../../assets/demo-bar.css">
 <style>
   :root {
     --accent: #2ca9a3;
@@ -272,67 +271,9 @@
     .a4-sheet { margin: 0; box-shadow: none; }
   }
 
-  #authGate {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    text-align: center;
-    padding: 24px;
-  }
-  #authGate h2 { font-size: 18px; margin: 0; }
-  #authGate p { color: var(--muted); font-size: 13px; margin: 0; max-width: 320px; }
-  #btnGoogleLogin {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 18px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  #btnGoogleLogin:hover { background: #f5f5f5; }
-  #authDeniedNote { color: #c0392b; font-size: 13px; display: none; }
-  #userBar {
-    display: none;
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 8px 24px 0;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 10px;
-    font-size: 12px;
-    color: var(--muted);
-  }
-  #btnLogout {
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 4px 12px;
-    font-size: 12px;
-    cursor: pointer;
-    color: var(--text);
-  }
 </style>
 </head>
 <body>
-
-<div id="authGate">
-  <h2>領収書発行システム</h2>
-  <p>このアプリは許可されたGoogleアカウントのみ利用できます。</p>
-  <button id="btnGoogleLogin">Googleでログイン</button>
-  <p id="authDeniedNote">このGoogleアカウントには利用権限がありません。許可されたアカウントでログインし直してください。</p>
-</div>
-
-<div id="userBar">
-  <span id="userEmailLabel"></span>
-  <button id="btnLogout">ログアウト</button>
-</div>
 
 <div class="app" id="appRoot" style="display:none;">
   <h1>領収書発行システム</h1>
@@ -408,10 +349,8 @@
         <button class="btn-print" id="btnPrint">PDFをダウンロード</button>
       </div>
     </div>
-    <div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">
-      <a href="https://drive.google.com/drive/folders/1pVS0SkNMIiLIdEPXD8RS--CxvyDH9pHL" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:6px; color:var(--accent); font-size:13px; font-weight:600; text-decoration:none;">
-        📁 領収書格納用ドライブフォルダを開く
-      </a>
+    <div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border); font-size:13px; color:var(--muted);">
+      ※ 実運用版には、出力したPDFの格納先Googleドライブフォルダを開くリンクがあります。デモ版では省いています。
     </div>
   </div>
 </div>
@@ -429,11 +368,12 @@ const DESC_OPTIONS_METARISE = [
   "研修参加費として"
 ];
 
+// ※ デモ版のため、会社名・登録番号・住所はすべて架空のものに置き換えています。
 const DEFAULT_COMPANIES = [
-  { id: "metarise", name: "株式会社metarise", invoice: "T6012401034652", address: "150-0031\n東京都渋谷区桜丘町 31-14 603号室" },
-  { id: "cbs", name: "CBS出版株式会社", invoice: "T1011001144890", address: "150-0031\n東京都渋谷区桜丘町 31-14 603号室" },
-  { id: "soshi", name: "株式会社創智", invoice: "T3011001145929", address: "150-0031\n東京都渋谷区桜丘町 31-14 603号室" },
-  { id: "mirai", name: "未来推進株式会社", invoice: "", address: "150-0043\n東京都渋谷区道玄坂1丁目2番3号 渋谷フクラス17階" }
+  { id: "metarise", name: "株式会社ソラミナ", invoice: "T9000000000011", address: "150-0000\n架空県ナギサ市みなと3-2-1 サンプルビル402" },
+  { id: "cbs", name: "アオイ出版株式会社", invoice: "T9000000000022", address: "150-0000\n架空県ナギサ市みなと3-2-1 サンプルビル402" },
+  { id: "soshi", name: "株式会社トキワ学舎", invoice: "T9000000000033", address: "150-0000\n架空県ナギサ市みなと3-2-1 サンプルビル402" },
+  { id: "mirai", name: "ハルカゼ推進株式会社", invoice: "", address: "160-0000\n架空県ミドリ市春風5-3-2 ハルカゼビル7F" }
 ];
 
 let state = loadState();
@@ -802,68 +742,63 @@ function initApp() {
   renderAll();
 }
 
-// ---------- Google login gate ----------
-// このアプリを使えるのは下記メールアドレスのGoogleアカウントのみです。
-const ALLOWED_EMAILS = [
-  "kenta0720fila@gmail.com",
-  "helpdesk.customer.center@gmail.com"
-];
+/* ============================================================
+   デモ版のための起動処理
+   ------------------------------------------------------------
+   実運用版はここで Firebase Authentication による Googleログインを
+   行い、許可されたアカウントのときだけ画面を表示しています。
 
-// Firebaseプロジェクト作成後、この設定値を実際の値に書き換えてください。
-// (Firebaseコンソール > プロジェクトの設定 > マイアプリ > SDK の設定と構成 から取得)
-const firebaseConfig = {
-  apiKey: "AIzaSyDHU3PUI-kDdiSo8aZBEPad4SoaqGuk5WQ",
-  authDomain: "receipt-generator-jp2026.firebaseapp.com",
-  projectId: "receipt-generator-jp2026",
-  storageBucket: "receipt-generator-jp2026.firebasestorage.app",
-  messagingSenderId: "165637150952",
-  appId: "1:165637150952:web:faf38415b4b277e296115d"
-};
+   デモ版は、誰でもURLを開くだけで触れるように、
+   ログイン処理そのものを取り除いてあります。
+   ・Firebase の読み込みも接続情報も入っていません
+   ・データはこの端末のブラウザ内だけに保存されます
+   ・登場する会社名・氏名・金額は、すべて架空のものです
+   ============================================================ */
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const googleProvider = new firebase.auth.GoogleAuthProvider();
-googleProvider.setCustomParameters({ hd: "gmail.com" });
+function demoSeedIfEmpty() {
+  if (localStorage.getItem(STORAGE_KEY)) return;
+  state = {
+    companies: JSON.parse(JSON.stringify(DEFAULT_COMPANIES)),
+    entries: [
+      { id: "d1", companyId: "cbs",   date: "2026-07-03", name: "青木 涼子", amount: 385000, desc: "受講料として" },
+      { id: "d2", companyId: "cbs",   date: "2026-07-08", name: "小林 大輔", amount: 198000, desc: "受講料として(クレジット利用)" },
+      { id: "d3", companyId: "cbs",   date: "2026-07-15", name: "西村 沙耶", amount: 550000, desc: "受講料として" },
+      { id: "d4", companyId: "soshi", date: "2026-07-11", name: "長谷川 慎一", amount: 264000, desc: "受講料として(クレジット利用)" },
+      { id: "d5", companyId: "soshi", date: "2026-07-22", name: "森本 佳奈", amount: 330000, desc: "受講料として" },
+      { id: "d6", companyId: "mirai", date: "2026-07-18", name: "岡田 隆之", amount: 121000, desc: "受講料として" },
+      { id: "d7", companyId: "metarise", date: "2026-07-25", name: "白石 遥",  amount: 88000, desc: "研修参加費として" }
+    ]
+  };
+  saveState();
+}
 
-const authGate = document.getElementById("authGate");
-const userBar = document.getElementById("userBar");
-const appRoot = document.getElementById("appRoot");
-const authDeniedNote = document.getElementById("authDeniedNote");
-let appInitialized = false;
+function demoReset() {
+  if (!confirm("サンプルデータを入れ直して、最初の状態に戻します。\nこの画面で入力・編集した内容は消えます。よろしいですか？")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
 
-document.getElementById("btnGoogleLogin").onclick = () => {
-  authDeniedNote.style.display = "none";
-  auth.signInWithPopup(googleProvider).catch(err => {
-    console.error(err);
-    alert("ログインに失敗しました。時間をおいて再度お試しください。");
-  });
-};
+function demoRenderBanner() {
+  const bar = document.createElement("div");
+  bar.className = "demo-bar";
+  bar.innerHTML =
+    '<span class="demo-badge">DEMO</span>' +
+    '<span class="demo-text">会社名・氏名・金額はすべて<strong>架空のサンプル</strong>です。' +
+    '実運用版はGoogleログインで利用者を制限していますが、デモ版はログインなしで触れるようにしています。</span>' +
+    '<span class="demo-actions">' +
+      '<button type="button" class="demo-btn" id="demoResetBtn">初期状態に戻す</button>' +
+      '<a class="demo-btn" href="../../">一覧に戻る</a>' +
+    '</span>';
+  document.body.insertBefore(bar, document.body.firstChild);
+  document.getElementById("demoResetBtn").addEventListener("click", demoReset);
+}
 
-document.getElementById("btnLogout").onclick = () => auth.signOut();
-
-auth.onAuthStateChanged(user => {
-  if (user && ALLOWED_EMAILS.includes(user.email)) {
-    authGate.style.display = "none";
-    userBar.style.display = "flex";
-    appRoot.style.display = "block";
-    document.getElementById("userEmailLabel").textContent = user.email;
-    if (!appInitialized) {
-      appInitialized = true;
-      initApp();
-    }
-  } else if (user) {
-    // ログインはしたが許可されていないアカウント
-    auth.signOut();
-    authGate.style.display = "flex";
-    userBar.style.display = "none";
-    appRoot.style.display = "none";
-    authDeniedNote.style.display = "block";
-  } else {
-    authGate.style.display = "flex";
-    userBar.style.display = "none";
-    appRoot.style.display = "none";
-  }
-});
+demoSeedIfEmpty();
+state = loadState();
+activeCompanyId = state.companies[0].id;
+document.getElementById("appRoot").style.display = "block";
+demoRenderBanner();
+initApp();
 </script>
 
 </body>
