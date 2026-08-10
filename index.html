@@ -231,6 +231,25 @@ h1 {
   font-size: .75rem;
 }
 
+.cost-note {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  margin-top: .7rem;
+  padding: .28rem .48rem;
+  border: 1px solid #b8d7c4;
+  background: #f2f8f4;
+  color: #276440;
+  font-size: .65rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.cost-note::before {
+  content: "✓";
+  font-size: .7rem;
+}
+
 .change {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -354,6 +373,7 @@ h1 {
             <div class="card-meta"><span>業務アプリ</span><span class="card-arrow" aria-hidden="true">→</span></div>
             <h3 class="card-title">定型書類を自動で作成</h3>
             <p class="card-use">請求書・見積書・申請書</p>
+            <span class="cost-note">ブラウザ内保存・データ追加費なし</span>
             <div class="change" aria-label="導入前後の変化">
               <div class="change-step"><span class="change-label">導入前</span><span class="change-text">転記・手計算</span></div>
               <span class="change-arrow" aria-hidden="true">→</span>
@@ -368,6 +388,7 @@ h1 {
             <div class="card-meta"><span>業務アプリ</span><span class="card-arrow" aria-hidden="true">→</span></div>
             <h3 class="card-title">一覧から書類を一括生成</h3>
             <p class="card-use">領収書・証明書・案内状</p>
+            <span class="cost-note">ブラウザ内保存・データ追加費なし</span>
             <div class="change" aria-label="導入前後の変化">
               <div class="change-step"><span class="change-label">導入前</span><span class="change-text">1件ずつ作成</span></div>
               <span class="change-arrow" aria-hidden="true">→</span>
@@ -382,6 +403,7 @@ h1 {
             <div class="card-meta"><span>業務アプリ</span><span class="card-arrow" aria-hidden="true">→</span></div>
             <h3 class="card-title">計画と実績を一元管理</h3>
             <p class="card-use">イベント予算・案件収支</p>
+            <span class="cost-note">ブラウザ内保存・データ追加費なし</span>
             <div class="change" aria-label="導入前後の変化">
               <div class="change-step"><span class="change-label">導入前</span><span class="change-text">複数ファイルで管理</span></div>
               <span class="change-arrow" aria-hidden="true">→</span>
@@ -396,6 +418,7 @@ h1 {
             <div class="card-meta"><span>業務アプリ</span><span class="card-arrow" aria-hidden="true">→</span></div>
             <h3 class="card-title">データを自動で集計・可視化</h3>
             <p class="card-use">メール・明細・報告データ</p>
+            <span class="cost-note">ブラウザ内保存・データ追加費なし</span>
             <div class="change" aria-label="導入前後の変化">
               <div class="change-step"><span class="change-label">導入前</span><span class="change-text">手作業で集計</span></div>
               <span class="change-arrow" aria-hidden="true">→</span>
