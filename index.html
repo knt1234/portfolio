@@ -391,6 +391,12 @@ h2 {
   letter-spacing: -.005em;
   color: var(--ink);
 }
+.note p {
+  margin: 0;
+  font-size: .9rem;
+  line-height: 1.9;
+  color: var(--ink-2);
+}
 .note ul { margin: 0; padding-left: 1.15rem; }
 .note li {
   margin-bottom: .4rem;
@@ -450,10 +456,9 @@ footer a:hover { color: var(--accent); }
     <span class="eyebrow"><span class="dot" aria-hidden="true"></span>AIで実現できること</span>
     <h1>AIを使って、<br>アイデアを使えるかたちに。</h1>
     <p class="lede">
-      業務の手間を減らすアプリ。複数の条件を整理する比較資料。
-      魅力が伝わり、行動につながる案内。
-      AIを制作の相棒に、目的に合わせて<strong>仕事の仕組み</strong>と
-      <strong>情報の見せ方</strong>を組み立てています。
+      掲載しているのは、そのまま使うための商品ではなく、<strong>AIで何ができるかを示す制作例</strong>です。
+      手作業を仕組みに変えるアプリも、URLから情報と画像を集めて作るチラシも、目的に合わせて設計できます。
+      「○○みたいなものも作れる？」と相談していただくための入口です。
     </p>
   </header>
 
@@ -469,16 +474,16 @@ footer a:hover { color: var(--accent); }
           </svg>
         </span>
         <div>
-          <h2>請求書の作成</h2>
-          <p class="card-kicker">毎月の作成を、選択と入力だけに</p>
+          <h2>定型書類を、入力だけで作成</h2>
+          <p class="card-kicker">用途例：請求書・見積書・申請書</p>
         </div>
       </div>
 
       <dl class="story">
-        <dt>課題</dt>
-        <dd>毎月、前月の請求書ファイルを複製し、日付と金額を書き換えていました。源泉徴収の計算を電卓で行っていたため、記載ミスも起きていました。</dd>
-        <dt>解決策</dt>
-        <dd>取引先を一度登録しておけば、あとは<strong>取引先を選び、金額を入力するだけ</strong>です。消費税と源泉徴収の差し引きまで自動で計算し、そのままPDFとして書き出します。発行した請求書は一覧に残るため、入金の有無も後から確認できます。</dd>
+        <dt>導入前</dt>
+        <dd>テンプレートの複製、日付や金額の転記、計算、発行後の管理を別々に行うため、作業の重複や入力ミス、確認漏れが起きやすい状態でした。</dd>
+        <dt>導入後</dt>
+        <dd>登録済みの相手先を選び、必要な項目を入力するだけ。<strong>計算、PDF作成、発行履歴、対応状況の管理まで一つの画面</strong>で完結します。</dd>
       </dl>
 
       <ul class="tags">
@@ -486,12 +491,12 @@ footer a:hover { color: var(--accent); }
       </ul>
 
       <details class="tech">
-        <summary>使用技術</summary>
-        <p>HTML / CSS / JavaScript のみ。PDF生成に jsPDF、保存はブラウザの localStorage。ビルド工程なしの静的ファイル1枚で完結。</p>
+        <summary>こんな用途にも</summary>
+        <p>見積書、納品書、申請書、注文書など、決まった形式に情報を入れて発行・管理する業務へ応用できます。</p>
       </details>
 
       <div class="card-foot">
-        <a class="open" href="apps/invoice/">デモを開く
+        <a class="open" href="apps/invoice/">操作例を見る
           <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
         </a>
       </div>
@@ -507,16 +512,16 @@ footer a:hover { color: var(--accent); }
           </svg>
         </span>
         <div>
-          <h2>領収書の発行</h2>
-          <p class="card-kicker">数十枚を貼り付け一括で作成</p>
+          <h2>一覧データから、書類を一括作成</h2>
+          <p class="card-kicker">用途例：領収書・証明書・案内状</p>
         </div>
       </div>
 
       <dl class="story">
-        <dt>課題</dt>
-        <dd>入金一覧を見ながら、領収書を1枚ずつ作成していました。月末に数十枚たまると、それだけで半日近く取られます。</dd>
-        <dt>解決策</dt>
-        <dd>入金一覧をコピーして<strong>貼り付けるだけで、必要な枚数をまとめて作成します</strong>。A4用紙に2枚ずつ配置した形で出力されるため、印刷して切り分けるだけで済みます。社名や但し書きは、発行元ごとに切り替えられます。</dd>
+        <dt>導入前</dt>
+        <dd>一覧を見ながら書類を一件ずつ作成し、宛名や金額を転記。件数が増えるほど、作成時間と転記・抜け漏れの確認が増えていました。</dd>
+        <dt>導入後</dt>
+        <dd>表計算の一覧を貼り付けるだけで、<strong>必要な書類をまとめて作成し、印刷しやすいPDFとして出力</strong>。発行元や文面の切り替えも一括で行えます。</dd>
       </dl>
 
       <ul class="tags">
@@ -524,12 +529,12 @@ footer a:hover { color: var(--accent); }
       </ul>
 
       <details class="tech">
-        <summary>使用技術</summary>
-        <p>HTML / CSS / JavaScript。画面を html2canvas で画像化し jsPDF で1つのPDFに結合。実際に稼働している版は Firebase Authentication で利用者を限定。</p>
+        <summary>こんな用途にも</summary>
+        <p>参加証、受講証明書、送付状、宛名ラベルなど、一覧から同じ形式の書類をまとめて作る業務へ応用できます。</p>
       </details>
 
       <div class="card-foot">
-        <a class="open" href="apps/receipt/">デモを開く
+        <a class="open" href="apps/receipt/">操作例を見る
           <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
         </a>
       </div>
@@ -546,29 +551,29 @@ footer a:hover { color: var(--accent); }
           </svg>
         </span>
         <div>
-          <h2>イベントの収支管理</h2>
-          <p class="card-kicker">複数案の比較から実績確認まで</p>
+          <h2>計画と実績を、チームで一元管理</h2>
+          <p class="card-kicker">用途例：イベント予算・案件収支</p>
         </div>
       </div>
 
       <dl class="story">
-        <dt>課題</dt>
-        <dd>合宿の見積もりを表計算ソフトで作成していましたが、2人で同時に編集すると計算式が壊れ、どれが最新版か分からなくなっていました。</dd>
-        <dt>解決策</dt>
-        <dd>宿泊の部屋数や食事の回数を変えた案を複数作成し、<strong>どの案が黒字になるか、何人集まれば採算が合うかを並べて比較できます</strong>。採用する案を決めたら予算として確定し、開催後に実績を入力して差額を確認します。2人が同時に開いても、一方の入力がもう一方の画面にすぐ反映されます。</dd>
+        <dt>導入前</dt>
+        <dd>複数の表計算ファイルに案や実績が分かれ、同時編集による計算式の崩れや、最新版・確定値の取り違えが起きやすい状態でした。</dd>
+        <dt>導入後</dt>
+        <dd>複数案の比較、採用案の確定、実績入力、差額確認までを一元化。<strong>誰が開いても同じ最新情報を見ながら、複数人で更新</strong>できます。</dd>
       </dl>
 
       <ul class="tags">
-        <li>複数の案を並べて比較</li><li>損益分岐点を自動計算</li><li>2人で同時に編集</li><li>自動保存</li>
+        <li>複数の案を並べて比較</li><li>損益分岐点を自動計算</li><li>複数人で同時編集</li><li>自動保存</li>
       </ul>
 
       <details class="tech">
-        <summary>使用技術</summary>
-        <p>Firebase Authentication（Googleログイン）＋ Cloud Firestore ＋ Firebase Hosting。onSnapshot による購読でリアルタイム同期。アプリ本体は約3,000行。</p>
+        <summary>こんな用途にも</summary>
+        <p>プロジェクト原価、店舗別予算、在庫計画など、複数案・確定値・実績をチームで管理する業務へ応用できます。</p>
       </details>
 
       <div class="card-foot">
-        <a class="open" href="apps/event-budget/">デモを開く
+        <a class="open" href="apps/event-budget/">操作例を見る
           <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
         </a>
       </div>
@@ -586,16 +591,16 @@ footer a:hover { color: var(--accent); }
           </svg>
         </span>
         <div>
-          <h2>クレジットカードの支出管理</h2>
-          <p class="card-kicker">4枚分を支払月ベースで集計</p>
+          <h2>届いた情報を、自動で集計・可視化</h2>
+          <p class="card-kicker">用途例：メール・明細・報告データ</p>
         </div>
       </div>
 
       <dl class="story">
-        <dt>課題</dt>
-        <dd>カード4枚の請求メールが個別に届くうえ、締め日も引き落とし日もカード会社ごとに異なります。結果として、月にいくら使っているのかを把握できていませんでした。</dd>
-        <dt>解決策</dt>
-        <dd>受信した請求メールを自動で読み取って集計し、<strong>実際に引き落とされた月を基準にそろえてグラフ化しました</strong>。締め日がずれるカードも、引き落とし月に合わせて計上しています。用途別の内訳と、毎月定額で引き落とされているサービスの抽出も行います。</dd>
+        <dt>導入前</dt>
+        <dd>情報が複数のメールや明細に分散し、集計基準もそろっていないため、全体像の把握には転記・分類・集計が必要でした。</dd>
+        <dt>導入後</dt>
+        <dd>届いた情報を自動で読み取り、基準をそろえて集計。<strong>推移、内訳、繰り返し発生する項目をグラフで確認</strong>でき、手作業の集計と見落としを減らします。</dd>
       </dl>
 
       <ul class="tags">
@@ -603,12 +608,12 @@ footer a:hover { color: var(--accent); }
       </ul>
 
       <details class="tech">
-        <summary>使用技術</summary>
-        <p>グラフ描画ライブラリを使わず、素の SVG を JavaScript で組み立て。メールからの抽出・集計は別途スクリプトで実行し、結果をこの画面に流し込む構成。</p>
+        <summary>こんな用途にも</summary>
+        <p>問い合わせメール、予約通知、売上報告、利用明細など、定期的に届く情報の集計・分類・可視化へ応用できます。</p>
       </details>
 
       <div class="card-foot">
-        <a class="open" href="apps/card-dashboard/">デモを開く
+        <a class="open" href="apps/card-dashboard/">操作例を見る
           <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
         </a>
       </div>
@@ -624,16 +629,18 @@ footer a:hover { color: var(--accent); }
           </svg>
         </span>
         <div>
-          <h2>体験の魅力を、1枚にまとめる</h2>
-          <p class="card-kicker">複数の条件を、申し込みにつながる順番に</p>
+          <h2>案内情報を、行動につながる一枚に</h2>
+          <p class="card-kicker">用途例：ホテル・施設・サービス案内</p>
         </div>
       </div>
 
       <dl class="story">
-        <dt>目的</dt>
-        <dd>複数の体験を組み合わせたプランを、<strong>価格・利用時間・選択肢</strong>までひと目で把握できるように整理しました。</dd>
-        <dt>設計</dt>
-        <dd>上質で落ち着いた滞在イメージを起点に、プラン比較、利用メリット、予約導線を上から順に配置。A4一枚で、内容の理解から行動までをつなげています。</dd>
+        <dt>用途</dt>
+        <dd>ホテル、飲食店、施設、サービスなど、魅力と利用条件を整理し、予約・申込みへつなげる案内チラシ。</dd>
+        <dt>工夫</dt>
+        <dd><strong>雰囲気、特徴、選択肢、料金、行動の順</strong>に情報を配置。写真の印象と、判断に必要な条件の読みやすさを両立しました。</dd>
+        <dt>URLから完成まで</dt>
+        <dd>公式ページのURLを渡すだけで、掲載情報と画像を自動取得。内容整理、構成、文章、デザイン、PDF・画像出力まで行います。</dd>
       </dl>
 
       <ul class="tags">
@@ -641,12 +648,12 @@ footer a:hover { color: var(--accent); }
       </ul>
 
       <details class="tech">
-        <summary>制作方法</summary>
-        <p>HTML / CSSでA4レイアウトを設計し、PDFと画像に書き出し。読みやすさを保ちながら、写真と料金・条件の優先順位を設計しました。</p>
+        <summary>制作範囲</summary>
+        <p>情報収集、画像取得、掲載内容の選定、構成案、コピー、レイアウト、PDF・PNG出力まで対応します。</p>
       </details>
 
       <div class="card-foot">
-        <a class="open" href="works/ibasho/">作品を見る
+        <a class="open" href="works/ibasho/">制作例を見る
           <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
         </a>
       </div>
@@ -662,16 +669,18 @@ footer a:hover { color: var(--accent); }
           </svg>
         </span>
         <div>
-          <h2>選択肢を、比べて決められる形に</h2>
-          <p class="card-kicker">条件の違いを、迷わず選べる比較に</p>
+          <h2>複数の選択肢を、比べやすい一枚に</h2>
+          <p class="card-kicker">用途例：スポーツ・イベント・チケット案内</p>
         </div>
       </div>
 
       <dl class="story">
-        <dt>目的</dt>
-        <dd>対戦カード、日程、座席と価格、来場特典が異なる2試合を、<strong>どちらが自分に合うか比較して選べる</strong>一枚にまとめました。</dd>
-        <dt>設計</dt>
-        <dd>左右で情報の構造をそろえ、チームごとの色で瞬時に区別。価格は席種ごとに縦に並べ、チケットの条件と注意点をカード下部に分離しています。</dd>
+        <dt>用途</dt>
+        <dd>スポーツ、イベント、旅行、商品プランなど、条件の異なる候補を並べて紹介する比較チラシ。</dd>
+        <dt>工夫</dt>
+        <dd><strong>比較項目と情報の順序をそろえ、色と余白で選択肢を区別</strong>。違いを探さなくても、同じ視線の流れで比べられるようにしました。</dd>
+        <dt>URLから完成まで</dt>
+        <dd>比較したい公式URLを渡すだけで、条件と画像を自動取得。比較軸の設計、情報整理、デザイン、PDF・画像出力まで行います。</dd>
       </dl>
 
       <ul class="tags">
@@ -679,18 +688,23 @@ footer a:hover { color: var(--accent); }
       </ul>
 
       <details class="tech">
-        <summary>制作方法</summary>
-        <p>HTML / CSSでA4レイアウトを設計し、PDFと画像に書き出し。複数の公式情報を比較しやすい共通フォーマットに再構成しました。</p>
+        <summary>制作範囲</summary>
+        <p>複数URLの情報収集、画像取得、比較項目の設計、構成案、コピー、レイアウト、PDF・PNG出力まで対応します。</p>
       </details>
 
       <div class="card-foot">
-        <a class="open" href="works/baseball/">作品を見る
+        <a class="open" href="works/baseball/">制作例を見る
           <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
         </a>
       </div>
     </article>
 
   </main>
+
+  <section class="note">
+    <h3>「こんなものも作れる？」からご相談ください</h3>
+    <p>掲載例と同じ内容でなくても構いません。いま手作業で行っていること、複数の資料に分かれていること、URLはあるけれど伝え方が決まっていないことから、必要な形を一緒に考えられます。</p>
+  </section>
 
   <section class="note">
     <h3>デモ版について</h3>

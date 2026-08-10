@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>体験の魅力を、1枚にまとめる｜ポートフォリオ</title>
+<title>案内情報を、行動につながる一枚に｜ポートフォリオ</title>
 <style>
   :root { color-scheme: light dark; --page: #f2f2ef; --surface: #fff; --ink: #18201d; --muted: #68706b; --line: #d8ddd8; --accent: #1c5141; }
   @media (prefers-color-scheme: dark) { :root { --page: #121614; --surface: #1d2420; --ink: #f1f4ef; --muted: #b4bcb5; --line: #39443d; --accent: #a6d5b5; } }
@@ -21,7 +21,12 @@
   .button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
   figure { margin: 0; padding: clamp(8px, 2vw, 18px); border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
   figure img { display: block; width: 100%; height: auto; box-shadow: 0 3px 18px rgb(0 0 0 / .14); }
+  .brief { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 24px 0; }
+  .brief div { padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+  .brief strong { display: block; margin-bottom: 5px; color: var(--accent); font-size: .76rem; letter-spacing: .06em; }
+  .brief p { margin: 0; color: var(--muted); font-size: .88rem; }
   figcaption { padding: 12px 4px 2px; color: var(--muted); font-size: .84rem; }
+  @media (max-width: 680px) { .brief { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -29,12 +34,17 @@
   <a class="back" href="../../">← ポートフォリオへ戻る</a>
   <header>
     <p class="eyebrow">INFORMATION DESIGN / A4 FLYER</p>
-    <h1>体験の魅力を、1枚にまとめる</h1>
-    <p class="lede">複数の体験を組み合わせたプランを、内容・価格・利用条件までひと目で理解できるように整理。知る、比べる、申し込むという流れを、一枚の中でつなげる情報デザインです。</p>
+    <h1>案内情報を、行動につながる一枚に</h1>
+    <p class="lede">ホテル・施設・サービスの魅力と利用条件を整理し、知る、理解する、申し込むという流れを一枚の中でつなげます。</p>
   </header>
+  <section class="brief" aria-label="制作内容">
+    <div><strong>用途</strong><p>ホテル、飲食店、施設、サービスの案内</p></div>
+    <div><strong>受け取ったもの</strong><p>公式ページのURL</p></div>
+    <div><strong>AIで行ったこと</strong><p>情報と画像の取得、内容整理、構成、コピー、デザイン、PDF・PNG出力</p></div>
+  </section>
   <div class="actions">
     <a class="button primary" href="ibasho_lunch_flyer.pdf" target="_blank">PDFを開く</a>
-    <a class="button" href="https://www.keioplaza.co.jp/event/ibashoplan/" target="_blank" rel="noopener">公式ページを見る</a>
+    <a class="button" href="https://www.keioplaza.co.jp/event/ibashoplan/" target="_blank" rel="noopener">入力元の公式ページ</a>
   </div>
   <figure>
     <img src="ibasho_lunch_flyer.png" alt="ホテルのランチとラウンジを組み合わせたプランのA4チラシ">
