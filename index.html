@@ -3,724 +3,446 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AIでアイデアを使えるかたちに｜ポートフォリオ</title>
-<meta name="description" content="AIを使って、業務アプリ、比較資料、案内チラシなどを制作。仕事や情報を、目的に合った使いやすいかたちにしています。">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧰</text></svg>">
+<title>AIで、仕事の可能性を形にする｜ポートフォリオ</title>
+<meta name="description" content="業務アプリから情報デザインまで、AIを活用して目的に合わせた仕組みと制作物を形にしたポートフォリオです。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◼</text></svg>">
 <style>
-/* ============================================================
-   1. 配色とトークン
-   ------------------------------------------------------------
-   閲覧者のOSの明暗設定にそのまま従う。
-   影・境界・面の3層で奥行きを作り、色は最小限にとどめる。
-   ============================================================ */
 :root {
-  color-scheme: light dark;
-
-  --page:        #f2f2ef;
-  --wash-a:      rgba(31, 111, 235, .07);
-  --wash-b:      rgba(120, 90, 200, .05);
-
-  --surface:     rgba(255, 255, 255, .72);
-  --surface-2:   rgba(255, 255, 255, .55);
-  --edge-top:    rgba(255, 255, 255, .9);
-
-  --ink:         #14161a;
-  --ink-2:       #474c54;
-  --ink-3:       #7b818a;
-
-  --line:        rgba(20, 22, 26, .09);
-  --line-2:      rgba(20, 22, 26, .055);
-
-  --accent:      #1668e3;
-  --accent-soft: rgba(22, 104, 227, .10);
-  --accent-ink:  #ffffff;
-
-  --shadow-1: 0 1px 2px rgba(16, 18, 22, .05);
-  --shadow-2: 0 1px 2px rgba(16, 18, 22, .05), 0 12px 30px rgba(16, 18, 22, .07);
-  --shadow-3: 0 2px 5px rgba(16, 18, 22, .07), 0 22px 52px rgba(16, 18, 22, .12);
-
-  --blur: blur(24px) saturate(180%);
-
-  /* 減衰しきったばね。行きすぎず、すっと止まる */
-  --ease-spring: cubic-bezier(.32, .72, 0, 1);
-  --ease-out:    cubic-bezier(.16, 1, .3, 1);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --page:        #0c0d0f;
-    --wash-a:      rgba(80, 140, 255, .10);
-    --wash-b:      rgba(150, 120, 255, .07);
-
-    --surface:     rgba(30, 33, 38, .72);
-    --surface-2:   rgba(38, 42, 48, .55);
-    --edge-top:    rgba(255, 255, 255, .10);
-
-    --ink:         #f4f5f7;
-    --ink-2:       #b9bec6;
-    --ink-3:       #868d97;
-
-    --line:        rgba(255, 255, 255, .10);
-    --line-2:      rgba(255, 255, 255, .06);
-
-    --accent:      #74acff;
-    --accent-soft: rgba(116, 172, 255, .14);
-    --accent-ink:  #0c0d0f;
-
-    --shadow-1: 0 1px 2px rgba(0, 0, 0, .45);
-    --shadow-2: 0 1px 2px rgba(0, 0, 0, .45), 0 12px 30px rgba(0, 0, 0, .38);
-    --shadow-3: 0 2px 5px rgba(0, 0, 0, .5), 0 22px 52px rgba(0, 0, 0, .5);
-  }
-}
-
-/* 透明度を控える設定の人には、すりガラスをやめて不透明にする */
-@media (prefers-reduced-transparency: reduce) {
-  :root {
-    --surface: Canvas;
-    --surface-2: Canvas;
-    --blur: none;
-  }
-  body::before { display: none; }
-}
-
-/* コントラストを上げる設定の人には、面を締めて境界をはっきりさせる */
-@media (prefers-contrast: more) {
-  :root {
-    --surface: Canvas;
-    --surface-2: Canvas;
-    --line: CanvasText;
-    --blur: none;
-    --ink-2: CanvasText;
-  }
+  color-scheme: light;
+  --paper: #f6f5f1;
+  --white: #ffffff;
+  --ink: #111214;
+  --muted: #686b70;
+  --line: #d8d8d3;
+  --blue: #1258e8;
+  --blue-soft: #eaf0ff;
 }
 
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-}
-
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  min-height: 100%;
-  background: var(--page);
+  background: var(--paper);
   color: var(--ink);
-  /* 端末の標準フォントを使う。字形も字間も、その端末向けに調整済みのため */
-  font: 100%/1.75 system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
   font-size: 16px;
-  letter-spacing: .012em;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-/* すりガラスの下に敷く、ごく淡い光。面に厚みを感じさせるため */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(70rem 40rem at 12% -8%, var(--wash-a), transparent 62%),
-    radial-gradient(60rem 38rem at 92% 4%, var(--wash-b), transparent 60%);
-}
-
-.wrap {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: clamp(3rem, 8vw, 6.5rem) clamp(1.25rem, 4vw, 2.5rem) 6rem;
-}
-
-/* ============================================================
-   2. 導入
-   ============================================================ */
-/* 幅の指定に ch は使わない。日本語では「0」の字幅が基準になり、
-   想定の半分ほどの幅になってしまうため。rem で決め打つ。 */
-.masthead {
-  max-width: 52rem;
-  margin-bottom: clamp(2.75rem, 7vw, 4.5rem);
-}
-
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: .45rem;
-  margin: 0 0 1.15rem;
-  padding: .34rem .8rem .34rem .55rem;
-  border: 1px solid var(--line);
-  border-top-color: var(--edge-top);
-  border-radius: 999px;
-  background: var(--surface);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
-  box-shadow: var(--shadow-1);
-  font-size: .78rem;
-  font-weight: 600;
+  line-height: 1.65;
   letter-spacing: .01em;
-  color: var(--ink-2);
+  -webkit-font-smoothing: antialiased;
 }
-.eyebrow .dot {
-  width: .45rem; height: .45rem;
-  border-radius: 50%;
-  background: var(--accent);
+
+a { color: inherit; }
+img { max-width: 100%; }
+
+.shell {
+  width: min(100% - 48px, 1440px);
+  margin: 0 auto;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 76px;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  font-size: .82rem;
+  font-weight: 750;
+  letter-spacing: .08em;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: .82rem;
+  font-weight: 650;
+}
+
+.site-nav a {
+  text-decoration: none;
+  text-underline-offset: .3em;
+}
+.site-nav a:hover { color: var(--blue); }
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(18rem, .65fr);
+  gap: clamp(2rem, 6vw, 7rem);
+  align-items: end;
+  padding: clamp(3.5rem, 8vw, 7rem) 0 clamp(3rem, 6vw, 5rem);
+}
+
+.hero-label {
+  margin: 0 0 1.25rem;
+  color: var(--blue);
+  font-size: .82rem;
+  font-weight: 750;
+  letter-spacing: .09em;
 }
 
 h1 {
-  margin: 0 0 1.1rem;
-  font-size: clamp(1.78rem, 4.6vw, 3.05rem);
-  font-weight: 700;
-  /* 文字が大きくなるほど字間は空いて見えるので、その分を詰める */
-  letter-spacing: -.03em;
-  line-height: 1.24;
-  /* 各行の長さをそろえ、末尾に1〜2文字だけ残るのを避ける */
+  margin: 0;
+  max-width: 13em;
+  font-size: clamp(2.8rem, 6.4vw, 6.4rem);
+  font-weight: 720;
+  line-height: 1.12;
+  letter-spacing: -.055em;
   text-wrap: balance;
 }
 
-/* 狭い画面では、決め打ちの改行をやめて自然に折り返させる */
-@media (max-width: 40rem) {
-  h1 br { display: none; }
-}
-
-.lede {
-  margin: 0;
-  max-width: 38rem;
-  font-size: clamp(1.02rem, 2.1vw, 1.13rem);
+.hero-copy {
+  margin: 0 0 .55rem;
+  max-width: 29rem;
+  font-size: clamp(1.02rem, 1.5vw, 1.25rem);
   line-height: 1.9;
-  color: var(--ink-2);
+  color: var(--muted);
   text-wrap: pretty;
 }
-.lede strong { color: var(--ink); font-weight: 650; }
 
-/* ============================================================
-   3. カード
-   ============================================================ */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 23rem), 1fr));
-  gap: clamp(1rem, 2.2vw, 1.4rem);
-}
-
-.card {
-  display: flex;
-  flex-direction: column;
-  padding: clamp(1.5rem, 3vw, 2rem);
-  border: 1px solid var(--line);
-  /* 上辺だけ明るくして、面に光が当たっているように見せる */
-  border-top-color: var(--edge-top);
-  border-radius: 20px;
-  background: var(--surface);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
-  box-shadow: var(--shadow-2);
-  transition:
-    transform 420ms var(--ease-spring),
-    box-shadow 420ms var(--ease-spring),
-    border-color 420ms var(--ease-out);
-}
-
-@media (hover: hover) {
-  .card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-3);
-    border-color: color-mix(in srgb, var(--accent) 26%, var(--line));
-  }
-  .card:hover .icon {
-    background: var(--accent-soft);
-    transform: scale(1.04);
-  }
-}
-
-.card-head {
-  display: flex;
-  align-items: center;
-  gap: .85rem;
-  margin-bottom: 1.35rem;
-}
-
-.icon {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  border: 1px solid var(--line-2);
-  border-radius: 13px;
-  background: var(--surface-2);
-  color: var(--accent);
-  transition: background 420ms var(--ease-out), transform 420ms var(--ease-spring);
-}
-.icon svg { width: 1.35rem; height: 1.35rem; }
-
-h2 {
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: 660;
-  letter-spacing: -.015em;
-  line-height: 1.35;
-}
-.card-kicker {
-  margin: .1rem 0 0;
-  font-size: .8rem;
-  font-weight: 500;
-  color: var(--ink-3);
-  letter-spacing: .005em;
-}
-
-/* 課題 → 解決策 */
-.story { margin: 0 0 1.4rem; }
-
-.story dt {
-  display: inline-block;
-  margin-bottom: .35rem;
-  padding: .12rem .5rem;
-  border-radius: 6px;
-  background: var(--surface-2);
-  border: 1px solid var(--line-2);
-  font-size: .72rem;
-  font-weight: 650;
-  letter-spacing: .04em;
-  color: var(--ink-3);
-}
-.story dd {
-  margin: 0 0 1.15rem;
-  font-size: .925rem;
-  line-height: 1.85;
-  color: var(--ink-2);
-}
-.story dd:last-child { margin-bottom: 0; }
-.story dd strong { color: var(--ink); font-weight: 620; }
-
-.tags {
+.capability-list {
   display: flex;
   flex-wrap: wrap;
-  gap: .4rem;
-  margin: 0 0 1.5rem;
+  gap: .5rem;
+  margin: 1.5rem 0 0;
   padding: 0;
   list-style: none;
 }
-.tags li {
-  padding: .26rem .65rem;
-  border: 1px solid var(--line-2);
-  border-radius: 8px;
-  background: var(--surface-2);
-  font-size: .755rem;
-  font-weight: 500;
-  letter-spacing: .015em;
-  color: var(--ink-2);
-}
 
-/* 技術の話は、読みたい人だけが開ければよい。ひと段深いところに置く */
-.tech {
-  margin: 0 0 1.5rem;
-  border-top: 1px solid var(--line-2);
-  padding-top: .9rem;
-}
-.tech summary {
-  display: inline-flex;
-  align-items: center;
-  gap: .35rem;
-  font-size: .78rem;
-  font-weight: 550;
-  color: var(--ink-3);
-  cursor: pointer;
-  list-style: none;
-  transition: color 220ms var(--ease-out);
-}
-.tech summary::-webkit-details-marker { display: none; }
-.tech summary::before {
-  content: "";
-  width: .32rem; height: .32rem;
-  border-right: 1.6px solid currentColor;
-  border-bottom: 1.6px solid currentColor;
-  transform: rotate(-45deg);
-  transition: transform 300ms var(--ease-spring);
-}
-.tech[open] summary::before { transform: rotate(45deg); }
-.tech summary:hover { color: var(--ink-2); }
-.tech p {
-  margin: .7rem 0 0;
-  font-size: .8rem;
-  line-height: 1.8;
-  color: var(--ink-3);
-}
-
-.card-foot { margin-top: auto; }
-
-.open {
-  display: inline-flex;
-  align-items: center;
-  gap: .5rem;
-  padding: .68rem 1.2rem;
-  border-radius: 11px;
-  background: var(--accent);
-  color: var(--accent-ink);
-  font-size: .9rem;
-  font-weight: 620;
-  letter-spacing: .005em;
-  text-decoration: none;
-  box-shadow: 0 1px 2px rgba(16, 18, 22, .12);
-  /* 指を離してからでは遅い。押した瞬間に返す */
-  transition: transform 110ms var(--ease-out), box-shadow 260ms var(--ease-out), filter 260ms var(--ease-out);
-}
-.open:hover { box-shadow: 0 8px 22px color-mix(in srgb, var(--accent) 34%, transparent); filter: brightness(1.07); }
-.open:active { transform: scale(.968); transition-duration: 70ms; }
-.open:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.open .arr { transition: transform 340ms var(--ease-spring); }
-.open:hover .arr { transform: translateX(3px); }
-.open svg { width: .82rem; height: .82rem; }
-
-/* ============================================================
-   4. 注記とフッター
-   ============================================================ */
-.note {
-  margin: clamp(2.75rem, 6vw, 4rem) 0 0;
-  padding: 1.5rem 1.65rem;
+.capability-list li {
+  padding: .4rem .7rem;
   border: 1px solid var(--line);
-  border-top-color: var(--edge-top);
-  border-radius: 16px;
-  background: var(--surface-2);
-  backdrop-filter: var(--blur);
-  -webkit-backdrop-filter: var(--blur);
-  box-shadow: var(--shadow-1);
-}
-.note h3 {
-  margin: 0 0 .7rem;
-  font-size: .95rem;
+  background: rgba(255,255,255,.45);
+  font-size: .75rem;
   font-weight: 650;
-  letter-spacing: -.005em;
-  color: var(--ink);
 }
-.note p {
+
+.works-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.15rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--ink);
+}
+
+.works-head h2 {
   margin: 0;
-  font-size: .9rem;
-  line-height: 1.9;
-  color: var(--ink-2);
+  font-size: 1rem;
+  letter-spacing: .05em;
 }
-.note ul { margin: 0; padding-left: 1.15rem; }
-.note li {
-  margin-bottom: .4rem;
-  font-size: .875rem;
-  line-height: 1.8;
-  color: var(--ink-2);
-}
-.note li:last-child { margin-bottom: 0; }
-.note strong { color: var(--ink); font-weight: 620; }
 
-footer {
-  margin-top: 2.75rem;
-  font-size: .82rem;
-  color: var(--ink-3);
+.works-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: .78rem;
 }
-footer a {
-  color: var(--ink-2);
-  text-decoration-color: var(--line);
-  text-underline-offset: .25em;
-}
-footer a:hover { color: var(--accent); }
 
-/* ============================================================
-   5. 登場のしかた
-   ------------------------------------------------------------
-   届いた順に、ごく短く持ち上げながら現れる。
-   動きを控える設定の人には、この演出ごと出さない。
-   ============================================================ */
-@media (prefers-reduced-motion: no-preference) {
-  .rise {
-    opacity: 0;
-    transform: translateY(12px);
-    animation: rise 620ms var(--ease-spring) forwards;
+.works-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(.9rem, 2vw, 1.4rem);
+}
+
+.work-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--white);
+  text-decoration: none;
+  transition: transform 240ms ease, border-color 240ms ease, box-shadow 240ms ease;
+}
+
+@media (hover: hover) {
+  .work-card:hover {
+    transform: translateY(-3px);
+    border-color: #aeb4c0;
+    box-shadow: 0 14px 34px rgba(18, 24, 35, .08);
   }
-  .rise:nth-child(1) { animation-delay: 60ms; }
-  .rise:nth-child(2) { animation-delay: 130ms; }
-  .rise:nth-child(3) { animation-delay: 200ms; }
-  .rise:nth-child(4) { animation-delay: 270ms; }
-  .masthead.rise { animation-delay: 0ms; }
+  .work-card:hover .card-arrow { transform: translateX(4px); }
 }
 
-@keyframes rise {
-  to { opacity: 1; transform: none; }
+.preview {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  background: #e9e9e5;
+}
+
+.preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 500ms cubic-bezier(.2,.7,.2,1);
+}
+
+@media (hover: hover) {
+  .work-card:hover .preview img { transform: scale(1.015); }
+}
+
+.preview.flyer img {
+  object-position: center 18%;
+}
+
+.card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 1rem 1.05rem 1.05rem;
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: .45rem;
+  color: var(--blue);
+  font-size: .7rem;
+  font-weight: 750;
+  letter-spacing: .06em;
+}
+
+.card-arrow {
+  font-size: 1rem;
+  line-height: 1;
+  transition: transform 220ms ease;
+}
+
+.card-title {
+  margin: 0;
+  font-size: clamp(1rem, 1.25vw, 1.16rem);
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: -.015em;
+}
+
+.card-use {
+  margin: .3rem 0 0;
+  color: var(--muted);
+  font-size: .75rem;
+}
+
+.change {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: .55rem;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: .85rem;
+  border-top: 1px solid var(--line);
+}
+
+.change-step { min-width: 0; }
+.change-label {
+  display: block;
+  margin-bottom: .16rem;
+  color: var(--muted);
+  font-size: .63rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+}
+
+.change-text {
+  display: block;
+  font-size: .72rem;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.change-arrow {
+  color: var(--blue);
+  font-size: .9rem;
+}
+
+.change.three {
+  grid-template-columns: minmax(0,.85fr) auto minmax(0,1.25fr) auto minmax(0,.85fr);
+  gap: .35rem;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-top: clamp(2.5rem, 6vw, 5rem);
+  padding: 1.3rem 0 2.5rem;
+  border-top: 1px solid var(--ink);
+  color: var(--muted);
+  font-size: .75rem;
+}
+
+.footer p { margin: 0; }
+.footer a { text-underline-offset: .25em; }
+.footer a:hover { color: var(--blue); }
+
+@media (max-width: 980px) {
+  .works-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 720px) {
+  .shell { width: min(100% - 28px, 1440px); }
+  .site-header { min-height: 64px; }
+  .site-nav { gap: .9rem; }
+  .site-nav .desktop-only { display: none; }
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 3.5rem 0 3rem;
+  }
+  h1 { font-size: clamp(2.5rem, 13vw, 4.2rem); }
+  .hero-copy { margin: 0; }
+  .works-head { align-items: flex-start; flex-direction: column; gap: .25rem; }
+  .works-grid { grid-template-columns: 1fr; }
+  .preview { aspect-ratio: 16 / 9.5; }
+  .card-body { padding: 1rem; }
+  .card-title { font-size: 1.08rem; }
+  .footer { align-items: flex-start; flex-direction: column; gap: .5rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .card, .open, .icon, .arr, .tech summary::before { transition-duration: 1ms !important; }
-  .card:hover, .open:active, .icon { transform: none !important; }
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition-duration: 1ms !important; }
 }
 </style>
 </head>
 <body>
 
-<div class="wrap">
-
-  <header class="masthead rise">
-    <span class="eyebrow"><span class="dot" aria-hidden="true"></span>AIで実現できること</span>
-    <h1>AIを使って、<br>アイデアを使えるかたちに。</h1>
-    <p class="lede">
-      掲載しているのは、そのまま使うための商品ではなく、<strong>AIで何ができるかを示す制作例</strong>です。
-      手作業を仕組みに変えるアプリも、URLから情報と画像を集めて作るチラシも、目的に合わせて設計できます。
-      「○○みたいなものも作れる？」と相談していただくための入口です。
-    </p>
+<div class="shell">
+  <header class="site-header">
+    <span class="brand">AI活用ポートフォリオ</span>
+    <nav class="site-nav" aria-label="サイト内ナビゲーション">
+      <a href="#works">制作例</a>
+      <a class="desktop-only" href="https://github.com/knt1234/portfolio">GitHub</a>
+    </nav>
   </header>
 
-  <main class="grid">
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div>
+        <p class="hero-label">AIで実現できること</p>
+        <h1 id="hero-title">AIで、仕事の可能性を形にする。</h1>
+      </div>
+      <div>
+        <p class="hero-copy">業務アプリから情報デザインまで、目的に合わせて設計・制作します。</p>
+        <ul class="capability-list" aria-label="制作分野">
+          <li>業務アプリ</li>
+          <li>自動化</li>
+          <li>情報デザイン</li>
+        </ul>
+      </div>
+    </section>
 
-    <!-- ============ 請求書 ============ -->
-    <article class="card rise">
-      <div class="card-head">
-        <span class="icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/>
-          </svg>
-        </span>
-        <div>
-          <h2>定型書類を、入力だけで作成</h2>
-          <p class="card-kicker">用途例：請求書・見積書・申請書</p>
-        </div>
+    <section id="works" aria-labelledby="works-title">
+      <div class="works-head">
+        <h2 id="works-title">制作例</h2>
+        <p>カードを選ぶと、操作例またはPDFを確認できます。</p>
       </div>
 
-      <dl class="story">
-        <dt>導入前</dt>
-        <dd>テンプレートの複製、日付や金額の転記、計算、発行後の管理を別々に行うため、作業の重複や入力ミス、確認漏れが起きやすい状態でした。</dd>
-        <dt>導入後</dt>
-        <dd>登録済みの相手先を選び、必要な項目を入力するだけ。<strong>計算、PDF作成、発行履歴、対応状況の管理まで一つの画面</strong>で完結します。</dd>
-      </dl>
+      <div class="works-grid">
+        <a class="work-card" href="apps/invoice/">
+          <div class="preview"><img src="assets/previews/invoice.png" alt="請求書作成アプリの画面"></div>
+          <div class="card-body">
+            <div class="card-meta"><span>業務アプリ</span><span class="card-arrow" aria-hidden="true">→</span></div>
+            <h3 class="card-title">定型書類を自動で作成</h3>
+            <p class="card-use">請求書・見積書・申請書</p>
+            <div class="change" aria-label="導入前後の変化">
+              <div class="change-step"><span class="change-label">導入前</span><span class="change-text">転記・手計算</span></div>
+              <span class="change-arrow" aria-hidden="true">→</span>
+              <div class="change-step"><span class="change-label">導入後</span><span class="change-text">入力だけでPDF発行</span></div>
+            </div>
+          </div>
+        </a>
 
-      <ul class="tags">
-        <li>PDFで書き出し</li><li>消費税と源泉徴収を自動計算</li><li>入金状況の管理</li><li>スマホ対応</li>
-      </ul>
+        <a class="work-card" href="apps/receipt/">
+          <div class="preview"><img src="assets/previews/receipt.png" alt="一覧から書類を一括生成するアプリの画面"></div>
+          <div class="card-body">
+            <div class="card-meta"><span>業務アプリ</span><span class="card-arrow" aria-hidden="true">→</span></div>
+            <h3 class="card-title">一覧から書類を一括生成</h3>
+            <p class="card-use">領収書・証明書・案内状</p>
+            <div class="change" aria-label="導入前後の変化">
+              <div class="change-step"><span class="change-label">導入前</span><span class="change-text">1件ずつ作成</span></div>
+              <span class="change-arrow" aria-hidden="true">→</span>
+              <div class="change-step"><span class="change-label">導入後</span><span class="change-text">一覧から一括生成</span></div>
+            </div>
+          </div>
+        </a>
 
-      <details class="tech">
-        <summary>こんな用途にも</summary>
-        <p>見積書、納品書、申請書、注文書など、決まった形式に情報を入れて発行・管理する業務へ応用できます。</p>
-      </details>
+        <a class="work-card" href="apps/event-budget/">
+          <div class="preview"><img src="assets/previews/event-budget.png" alt="計画と実績を一元管理するアプリの画面"></div>
+          <div class="card-body">
+            <div class="card-meta"><span>業務アプリ</span><span class="card-arrow" aria-hidden="true">→</span></div>
+            <h3 class="card-title">計画と実績を一元管理</h3>
+            <p class="card-use">イベント予算・案件収支</p>
+            <div class="change" aria-label="導入前後の変化">
+              <div class="change-step"><span class="change-label">導入前</span><span class="change-text">複数ファイルで管理</span></div>
+              <span class="change-arrow" aria-hidden="true">→</span>
+              <div class="change-step"><span class="change-label">導入後</span><span class="change-text">1画面で共有・更新</span></div>
+            </div>
+          </div>
+        </a>
 
-      <div class="card-foot">
-        <a class="open" href="apps/invoice/">操作例を見る
-          <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+        <a class="work-card" href="apps/card-dashboard/">
+          <div class="preview"><img src="assets/previews/card-dashboard.png" alt="データを自動集計して可視化するダッシュボード画面"></div>
+          <div class="card-body">
+            <div class="card-meta"><span>業務アプリ</span><span class="card-arrow" aria-hidden="true">→</span></div>
+            <h3 class="card-title">データを自動で集計・可視化</h3>
+            <p class="card-use">メール・明細・報告データ</p>
+            <div class="change" aria-label="導入前後の変化">
+              <div class="change-step"><span class="change-label">導入前</span><span class="change-text">手作業で集計</span></div>
+              <span class="change-arrow" aria-hidden="true">→</span>
+              <div class="change-step"><span class="change-label">導入後</span><span class="change-text">自動でグラフ化</span></div>
+            </div>
+          </div>
+        </a>
+
+        <a class="work-card" href="works/ibasho/ibasho_lunch_flyer.pdf" target="_blank" rel="noopener">
+          <div class="preview flyer"><img src="works/ibasho/ibasho_lunch_flyer.png" alt="ホテルや施設の案内チラシ制作例"></div>
+          <div class="card-body">
+            <div class="card-meta"><span>情報デザイン</span><span class="card-arrow" aria-hidden="true">→</span></div>
+            <h3 class="card-title">案内情報を一枚に整理</h3>
+            <p class="card-use">ホテル・施設・サービス案内</p>
+            <div class="change three" aria-label="制作の流れ">
+              <div class="change-step"><span class="change-label">入力</span><span class="change-text">URL</span></div>
+              <span class="change-arrow" aria-hidden="true">→</span>
+              <div class="change-step"><span class="change-label">AI</span><span class="change-text">情報・画像を取得</span></div>
+              <span class="change-arrow" aria-hidden="true">→</span>
+              <div class="change-step"><span class="change-label">出力</span><span class="change-text">チラシ完成</span></div>
+            </div>
+          </div>
+        </a>
+
+        <a class="work-card" href="works/baseball/baseball_ticket_comparison.pdf" target="_blank" rel="noopener">
+          <div class="preview flyer"><img src="works/baseball/baseball_ticket_comparison.png" alt="スポーツやイベントの比較チラシ制作例"></div>
+          <div class="card-body">
+            <div class="card-meta"><span>情報デザイン</span><span class="card-arrow" aria-hidden="true">→</span></div>
+            <h3 class="card-title">選択肢を比べやすく整理</h3>
+            <p class="card-use">スポーツ・イベント・チケット案内</p>
+            <div class="change three" aria-label="制作の流れ">
+              <div class="change-step"><span class="change-label">入力</span><span class="change-text">URL</span></div>
+              <span class="change-arrow" aria-hidden="true">→</span>
+              <div class="change-step"><span class="change-label">AI</span><span class="change-text">情報・画像を取得</span></div>
+              <span class="change-arrow" aria-hidden="true">→</span>
+              <div class="change-step"><span class="change-label">出力</span><span class="change-text">比較表完成</span></div>
+            </div>
+          </div>
         </a>
       </div>
-    </article>
-
-    <!-- ============ 領収書 ============ -->
-    <article class="card rise">
-      <div class="card-head">
-        <span class="icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 2v20l2.5-1.5L9 22l2.5-1.5L14 22l2.5-1.5L19 22V2l-2.5 1.5L14 2l-2.5 1.5L9 2 6.5 3.5z"/>
-            <path d="M8 8h8"/><path d="M8 12h8"/>
-          </svg>
-        </span>
-        <div>
-          <h2>一覧データから、書類を一括作成</h2>
-          <p class="card-kicker">用途例：領収書・証明書・案内状</p>
-        </div>
-      </div>
-
-      <dl class="story">
-        <dt>導入前</dt>
-        <dd>一覧を見ながら書類を一件ずつ作成し、宛名や金額を転記。件数が増えるほど、作成時間と転記・抜け漏れの確認が増えていました。</dd>
-        <dt>導入後</dt>
-        <dd>表計算の一覧を貼り付けるだけで、<strong>必要な書類をまとめて作成し、印刷しやすいPDFとして出力</strong>。発行元や文面の切り替えも一括で行えます。</dd>
-      </dl>
-
-      <ul class="tags">
-        <li>貼り付けて一括作成</li><li>印刷用のPDFを出力</li><li>発行元ごとに切り替え</li>
-      </ul>
-
-      <details class="tech">
-        <summary>こんな用途にも</summary>
-        <p>参加証、受講証明書、送付状、宛名ラベルなど、一覧から同じ形式の書類をまとめて作る業務へ応用できます。</p>
-      </details>
-
-      <div class="card-foot">
-        <a class="open" href="apps/receipt/">操作例を見る
-          <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
-        </a>
-      </div>
-    </article>
-
-    <!-- ============ イベント収支 ============ -->
-    <article class="card rise">
-      <div class="card-head">
-        <span class="icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2"/>
-            <path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>
-            <path d="M8 17v-3"/><path d="M12 17v-5"/><path d="M16 17v-2"/>
-          </svg>
-        </span>
-        <div>
-          <h2>計画と実績を、チームで一元管理</h2>
-          <p class="card-kicker">用途例：イベント予算・案件収支</p>
-        </div>
-      </div>
-
-      <dl class="story">
-        <dt>導入前</dt>
-        <dd>複数の表計算ファイルに案や実績が分かれ、同時編集による計算式の崩れや、最新版・確定値の取り違えが起きやすい状態でした。</dd>
-        <dt>導入後</dt>
-        <dd>複数案の比較、採用案の確定、実績入力、差額確認までを一元化。<strong>誰が開いても同じ最新情報を見ながら、複数人で更新</strong>できます。</dd>
-      </dl>
-
-      <ul class="tags">
-        <li>複数の案を並べて比較</li><li>損益分岐点を自動計算</li><li>複数人で同時編集</li><li>自動保存</li>
-      </ul>
-
-      <details class="tech">
-        <summary>こんな用途にも</summary>
-        <p>プロジェクト原価、店舗別予算、在庫計画など、複数案・確定値・実績をチームで管理する業務へ応用できます。</p>
-      </details>
-
-      <div class="card-foot">
-        <a class="open" href="apps/event-budget/">操作例を見る
-          <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
-        </a>
-      </div>
-    </article>
-
-    <!-- ============ クレカ ============ -->
-    <article class="card rise">
-      <div class="card-head">
-        <span class="icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 3v18h18"/>
-            <rect x="7" y="12" width="3" height="6" rx="1"/>
-            <rect x="12.5" y="8" width="3" height="10" rx="1"/>
-            <rect x="18" y="5" width="3" height="13" rx="1"/>
-          </svg>
-        </span>
-        <div>
-          <h2>届いた情報を、自動で集計・可視化</h2>
-          <p class="card-kicker">用途例：メール・明細・報告データ</p>
-        </div>
-      </div>
-
-      <dl class="story">
-        <dt>導入前</dt>
-        <dd>情報が複数のメールや明細に分散し、集計基準もそろっていないため、全体像の把握には転記・分類・集計が必要でした。</dd>
-        <dt>導入後</dt>
-        <dd>届いた情報を自動で読み取り、基準をそろえて集計。<strong>推移、内訳、繰り返し発生する項目をグラフで確認</strong>でき、手作業の集計と見落としを減らします。</dd>
-      </dl>
-
-      <ul class="tags">
-        <li>メールから自動集計</li><li>グラフで推移を比較</li><li>用途別の内訳</li><li>定額サービスの検出</li>
-      </ul>
-
-      <details class="tech">
-        <summary>こんな用途にも</summary>
-        <p>問い合わせメール、予約通知、売上報告、利用明細など、定期的に届く情報の集計・分類・可視化へ応用できます。</p>
-      </details>
-
-      <div class="card-foot">
-        <a class="open" href="apps/card-dashboard/">操作例を見る
-          <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
-        </a>
-      </div>
-    </article>
-
-    <!-- ============ IBASHO flyer ============ -->
-    <article class="card rise">
-      <div class="card-head">
-        <span class="icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 3h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/>
-            <path d="M8 8h8M8 12h8M8 16h5"/>
-          </svg>
-        </span>
-        <div>
-          <h2>案内情報を、行動につながる一枚に</h2>
-          <p class="card-kicker">用途例：ホテル・施設・サービス案内</p>
-        </div>
-      </div>
-
-      <dl class="story">
-        <dt>用途</dt>
-        <dd>ホテル、飲食店、施設、サービスなど、魅力と利用条件を整理し、予約・申込みへつなげる案内チラシ。</dd>
-        <dt>工夫</dt>
-        <dd><strong>雰囲気、特徴、選択肢、料金、行動の順</strong>に情報を配置。写真の印象と、判断に必要な条件の読みやすさを両立しました。</dd>
-        <dt>URLから完成まで</dt>
-        <dd>公式ページのURLを渡すだけで、掲載情報と画像を自動取得。内容整理、構成、文章、デザイン、PDF・画像出力まで行います。</dd>
-      </dl>
-
-      <ul class="tags">
-        <li>A4チラシ</li><li>情報設計</li><li>比較の見せ方</li><li>予約導線</li>
-      </ul>
-
-      <details class="tech">
-        <summary>制作範囲</summary>
-        <p>情報収集、画像取得、掲載内容の選定、構成案、コピー、レイアウト、PDF・PNG出力まで対応します。</p>
-      </details>
-
-      <div class="card-foot">
-        <a class="open" href="works/ibasho/">制作例を見る
-          <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
-        </a>
-      </div>
-    </article>
-
-    <!-- ============ Baseball flyer ============ -->
-    <article class="card rise">
-      <div class="card-head">
-        <span class="icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="8.5"/>
-            <path d="M7.5 5.5c1.8 1.8 2.8 4 2.8 6.5s-1 4.7-2.8 6.5M16.5 5.5c-1.8 1.8-2.8 4-2.8 6.5s1 4.7 2.8 6.5"/>
-          </svg>
-        </span>
-        <div>
-          <h2>複数の選択肢を、比べやすい一枚に</h2>
-          <p class="card-kicker">用途例：スポーツ・イベント・チケット案内</p>
-        </div>
-      </div>
-
-      <dl class="story">
-        <dt>用途</dt>
-        <dd>スポーツ、イベント、旅行、商品プランなど、条件の異なる候補を並べて紹介する比較チラシ。</dd>
-        <dt>工夫</dt>
-        <dd><strong>比較項目と情報の順序をそろえ、色と余白で選択肢を区別</strong>。違いを探さなくても、同じ視線の流れで比べられるようにしました。</dd>
-        <dt>URLから完成まで</dt>
-        <dd>比較したい公式URLを渡すだけで、条件と画像を自動取得。比較軸の設計、情報整理、デザイン、PDF・画像出力まで行います。</dd>
-      </dl>
-
-      <ul class="tags">
-        <li>A4チラシ</li><li>比較表現</li><li>情報の優先順位</li><li>イベント案内</li>
-      </ul>
-
-      <details class="tech">
-        <summary>制作範囲</summary>
-        <p>複数URLの情報収集、画像取得、比較項目の設計、構成案、コピー、レイアウト、PDF・PNG出力まで対応します。</p>
-      </details>
-
-      <div class="card-foot">
-        <a class="open" href="works/baseball/">制作例を見る
-          <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
-        </a>
-      </div>
-    </article>
-
+    </section>
   </main>
 
-  <section class="note">
-    <h3>「こんなものも作れる？」からご相談ください</h3>
-    <p>掲載例と同じ内容でなくても構いません。いま手作業で行っていること、複数の資料に分かれていること、URLはあるけれど伝え方が決まっていないことから、必要な形を一緒に考えられます。</p>
-  </section>
-
-  <section class="note">
-    <h3>デモ版について</h3>
-    <ul>
-      <li>業務アプリに掲載している社名・氏名・金額は<strong>すべて架空</strong>です。実在の個人・法人および実際の取引とは関係ありません。</li>
-      <li>ログインは不要です。入力した内容は外部に送信されず、<strong>ご覧の端末内にのみ</strong>保存されます。</li>
-      <li>画面上部の「初期状態に戻す」で、いつでもサンプルデータの状態に戻せます。</li>
-      <li>業務アプリは実際に稼働しているものとは別のコピーで、実データは含まれていません。チラシはポートフォリオ用の制作物です。</li>
-    </ul>
-  </section>
-
-  <footer>
-    ソースコードはこちらで公開しています：
-    <a href="https://github.com/knt1234/portfolio">github.com/knt1234/portfolio</a>
+  <footer class="footer">
+    <p>掲載している業務アプリは、架空データを使用したデモ版です。</p>
+    <a href="https://github.com/knt1234/portfolio">ソースコードを見る</a>
   </footer>
-
 </div>
 
 </body>
