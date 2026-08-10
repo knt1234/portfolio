@@ -93,6 +93,13 @@ h1 {
   text-wrap: balance;
 }
 
+.hero-line {
+  display: block;
+  white-space: nowrap;
+}
+
+.hero-phrase { display: inline; }
+
 .hero-copy {
   margin: 0 0 .55rem;
   max-width: 29rem;
@@ -101,6 +108,8 @@ h1 {
   color: var(--muted);
   text-wrap: pretty;
 }
+
+.hero-copy span { display: block; }
 
 .capability-list {
   display: flex;
@@ -318,6 +327,8 @@ h1 {
     padding: 3.5rem 0 3rem;
   }
   h1 { font-size: clamp(2.5rem, 13vw, 4.2rem); }
+  .hero-line { white-space: normal; }
+  .hero-phrase { display: block; }
   .hero-copy { margin: 0; }
   .works-head { align-items: flex-start; flex-direction: column; gap: .25rem; }
   .works-grid { grid-template-columns: 1fr; }
@@ -348,10 +359,16 @@ h1 {
     <section class="hero" aria-labelledby="hero-title">
       <div>
         <p class="hero-label">AIで実現できること</p>
-        <h1 id="hero-title">AIで、仕事の可能性を形にする。</h1>
+        <h1 id="hero-title">
+          <span class="hero-line">AIで、仕事の</span>
+          <span class="hero-line"><span class="hero-phrase">可能性を</span><span class="hero-phrase">形にする。</span></span>
+        </h1>
       </div>
       <div>
-        <p class="hero-copy">業務アプリからチラシ・フライヤー制作まで、目的に合わせて設計・制作します。</p>
+        <p class="hero-copy">
+          <span>業務アプリからチラシ・フライヤー制作まで。</span>
+          <span>目的に合わせて設計・制作します。</span>
+        </p>
         <ul class="capability-list" aria-label="制作分野">
           <li>業務アプリ</li>
           <li>自動化</li>
